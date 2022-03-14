@@ -1,9 +1,9 @@
 #!header
+#define procedures.s
 
 cesare_crypt: # a0 stringa (ptr), a1 K -> (in place)
 # registri: a0, a1, a2, a3, a4, t0
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 li a2, 0 # indice for stringa
 
 loop_cesare_crypt:
@@ -28,14 +28,12 @@ sb t0, 0(a3)
 addi a2, a2, 1
 j loop_cesare_crypt
 end_loop_cesare_crypt:
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra
 
 cesare_decrypt: # a0 stringa (ptr), a1 K -> (in place)
 # registri: a0, a1, a2, a3, a4, t0
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 li a2, 0 # indice for stringa
 
 loop_cesare_decrypt:
@@ -60,6 +58,5 @@ sb t0, 0(a3)
 addi a2, a2, 1
 j loop_cesare_decrypt
 end_loop_cesare_decrypt:
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra

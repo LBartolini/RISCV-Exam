@@ -1,7 +1,7 @@
 
 .data
 K_cesare: .word 1
-Key_blocchi: .string "a"
+Key_blocchi: .string "abc"
 plain_text: .string "abcdefghi"
 .text
 j main
@@ -128,9 +128,11 @@ li a2, 0 # indice for stringa
 
 addi sp, sp, -4
 sw a0, 0(sp)
+
 addi a0, a1, 0
 jal str_len
 addi t1, a0, 0 # len key
+
 lw a0, 0(sp)
 addi sp, sp 4
 

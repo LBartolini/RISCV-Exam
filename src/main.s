@@ -2,6 +2,7 @@
 #include utils.s
 #include cesare.s
 #include blocchi.s
+#define procedures.s
 
 .data
 K_cesare: .word 1

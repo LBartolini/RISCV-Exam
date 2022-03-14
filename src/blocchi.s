@@ -1,16 +1,18 @@
 #!header
+#define procedures.s
 
 blocchi_crypt: # a0 stringa (ptr), a1 key (ptr) -> (in place)
 # registri: a0, a1, a2, a3, a4, a5, t0, t1, t2
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 li a2, 0 # indice for stringa
 
 addi sp, sp, -4
 sw a0, 0(sp)
+
 addi a0, a1, 0
 jal str_len
 addi t1, a0, 0 # len key
+
 lw a0, 0(sp)
 addi sp, sp 4
 
@@ -52,14 +54,12 @@ addi a2, a2, 1
 j loop_blocchi_crypt
 end_loop_blocchi_crypt:
 
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra
 
 blocchi_decrypt: # a0 stringa (ptr), a1 key (ptr) -> (in place)
 # registri: a0, a1, a2, a3, a4, a5, t0, t1, t2
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 li a2, 0 # indice for stringa
 
 addi sp, sp, -4
@@ -108,6 +108,5 @@ addi a2, a2, 1
 j loop_blocchi_decrypt
 end_loop_blocchi_decrypt:
 
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra

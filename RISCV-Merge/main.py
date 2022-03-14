@@ -13,6 +13,34 @@ class NotHeaderFile(Exception):
         message = "Header file must be a header file! (first line has to be '#!header'"
         super().__init__(message)
 
+class StoredProcedure:
+    def __init__(self, nome, code):
+        self.nome = nome
+        self.code = code
+
+def get_stored_procedures(path):
+    procedures = []
+    codice = ""
+    nome = ""
+
+    with open(path, 'r') as f:
+        lines = f.readlines()
+
+    in_proc = False
+    for l in lines[1:]:
+        if l.startswith('#!'): 
+            in_proc = not in_proc
+            if in_proc:
+                nome = l[2:].strip()
+            else:
+                procedures.append(StoredProcedure(nome, codice))
+                nome = ""
+                codice = ""
+        elif in_proc:
+            codice += l
+    
+    return procedures
+
 def merge(source_path, dir=None, header=False):
     directory = os.path.dirname(source_path) if dir is None else dir
     out = f"\n\n#####\n## ({source_path})\n" if header else ""
@@ -27,11 +55,17 @@ def merge(source_path, dir=None, header=False):
         raise NotHeaderFile
 
     main_found = False
-    
+
+    stored_procedures = []
     files_to_include = []
     for l in lines[1:]:
         if l.startswith('#include'):
             files_to_include.append(l[8:].strip())
+        elif l.startswith('#define'):
+            [stored_procedures.append(x) for x in get_stored_procedures(directory+'/'+l[7:].strip())]
+        elif l.startswith('#!'):
+            nome_proc = l[2:].strip()
+            out += next(x.code for x in stored_procedures if x.nome == nome_proc )
         else:
             if l.strip() == 'main:':
                 if header: break

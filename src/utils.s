@@ -1,9 +1,9 @@
 #!header
+#define procedures.s
 
 modulo: # a0 x, a1 n -> a0 (x%n)
 # registri: a0, a1
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 
 loop_modulo_1:
 bge a0, zero, loop_modulo_2
@@ -16,14 +16,12 @@ sub a0, a0, a1
 j loop_modulo_2
 
 end_modulo:
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra
 
 str_len: # a0 stringa (ptr) -> a0 len
 # registri: a0, t0, t1, t2
-addi sp, sp, -4
-sw ra, 0(sp)
+#! push_ra
 li t1, 0
 
 loop_str_len:
@@ -35,6 +33,5 @@ j loop_str_len
 
 end_str_len:
 addi a0, t1, 0
-lw ra, 0(sp)
-addi sp, sp, 4
+#! pop_ra
 jr ra

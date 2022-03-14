@@ -15,7 +15,7 @@ class NotHeaderFile(Exception):
 
 def merge(source_path, dir=None, header=False):
     directory = os.path.dirname(source_path) if dir is None else dir
-    out = f"\n\n## ({source_path})\n" if header else ""
+    out = f"\n\n#####\n## ({source_path})\n" if header else ""
     path = source_path if not header else directory+'/'+source_path
 
     with open(path, 'r') as f:
@@ -27,25 +27,12 @@ def merge(source_path, dir=None, header=False):
         raise NotHeaderFile
 
     main_found = False
-    in_procedure = False
-    in_data = False
     
     files_to_include = []
     for l in lines[1:]:
         if l.startswith('#include'):
             files_to_include.append(l[8:].strip())
         else:
-            if header and l.strip() == '.data': 
-                in_data = True
-                continue
-            elif header and l.strip() == '.text':
-                in_data = False
-                continue
-            elif header and in_data: continue
-
-            if header and ':' in l.strip(): in_procedure = True
-            if header and not in_procedure: continue
-
             if l.strip() == 'main:':
                 if header: break
                 main_found=True
@@ -54,7 +41,7 @@ def merge(source_path, dir=None, header=False):
                 if not header and len(files_to_include) > 0: out += "### START HEADERS ###"
                 for lib in files_to_include:
                     out += merge(lib, directory, True) + '\n'
-                if not header and len(files_to_include) > 0: out += "### END HEADERS ###\n\n"
+                if not header and len(files_to_include) > 0: out += "\n### END HEADERS ###\n\n"
                 files_to_include = []
 
             out += l

@@ -185,11 +185,13 @@ sw ra, 0(sp)
 li a2, 0 # indice for stringa
 
 addi sp, sp, -4
-sw a0, 0(sp)
+sw a0, 0(sp) # push a0
+
 addi a0, a1, 0
 jal str_len
 addi t1, a0, 0 # len key
-lw a0, 0(sp)
+
+lw a0, 0(sp) # pop a0
 addi sp, sp 4
 
 loop_blocchi_decrypt:

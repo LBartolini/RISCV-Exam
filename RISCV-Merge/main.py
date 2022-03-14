@@ -1,6 +1,7 @@
 import argparse
 import os
 import pyperclip
+import re
 
 class NotMainFile(Exception):
     def __init__(self):
@@ -14,7 +15,7 @@ class NotHeaderFile(Exception):
 
 def merge(source_path, dir=None, header=False):
     directory = os.path.dirname(source_path) if dir is None else dir
-    out = f"\n\n## ({source_path})" if header else ""
+    out = f"\n\n## ({source_path})\n" if header else ""
     path = source_path if not header else directory+'/'+source_path
 
     with open(path, 'r') as f:
@@ -26,13 +27,24 @@ def merge(source_path, dir=None, header=False):
         raise NotHeaderFile
 
     main_found = False
+    in_procedure = False
+    in_data = False
+    
     files_to_include = []
     for l in lines[1:]:
         if l.startswith('#include'):
             files_to_include.append(l[8:].strip())
         else:
-            if header and l.strip() == 'j main': continue
-            if header and (l.strip() == '.text' or l.strip() == '.data'): continue
+            if header and l.strip() == '.data': 
+                in_data = True
+                continue
+            elif header and l.strip() == '.text':
+                in_data = False
+                continue
+            elif header and in_data: continue
+
+            if header and ':' in l.strip(): in_procedure = True
+            if header and not in_procedure: continue
 
             if l.strip() == 'main:':
                 if header: break
@@ -69,6 +81,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     out = merge(args.s)
+    out = re.sub(r'\n\s*\n', '\n\n', out)
 
     if args.o is not None:
         with open(args.o, 'w') as f:

@@ -14,12 +14,12 @@ fattoriale:
 fatt:
     addi sp, sp, -4 # push(ra)
     sw ra, 0(sp)
-    
+
     beq a1, s1, fine_fattoriale
-    
+
     jal mult
     addi a1, a1, -1
-    
+
     jal fatt
 
 fine_fattoriale:
@@ -40,7 +40,7 @@ loop_mult:
     j loop_mult
 fine_loop:
     add a0, t1, zero
-    
+
     lw ra, 0(sp) # pop(ra)
     addi sp, sp, 4
     jr ra 

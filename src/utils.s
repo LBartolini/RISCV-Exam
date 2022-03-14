@@ -1,20 +1,21 @@
 #!header
-#include utils2.s
 
-fattoriale:
-    addi a1, a0, -1
-fatt:
-    addi sp, sp, -4 # push(ra)
-    sw ra, 0(sp)
-    
-    beq a1, s1, fine_fattoriale
-    
-    jal mult
-    addi a1, a1, -1
-    
-    jal fatt
+modulo: # a0 x, a1 n -> a0 (x%n)
+# registri: a0, a1
+addi sp, sp, -4
+sw ra, 0(sp)
 
-fine_fattoriale:
-    lw ra, 0(sp) # pop(ra)
-    addi sp, sp, 4
-    jr ra 
+loop_modulo_1:
+bge a0, zero, loop_modulo_2
+add a0, a0, a1
+j loop_modulo_1
+
+loop_modulo_2:
+blt a0, a1, end_modulo
+sub a0, a0, a1
+j loop_modulo_2
+
+end_modulo:
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra

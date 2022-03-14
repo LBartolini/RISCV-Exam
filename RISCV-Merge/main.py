@@ -86,7 +86,8 @@ if __name__ == "__main__":
     if args.o is not None:
         with open(args.o, 'w') as f:
             f.write(out)
-    elif args.cc:
+    if args.cc:
         pyperclip.copy(out)
-    else:
-        print('Please select a way of representing the output!')
+
+    if not args.cc and args.o is None:
+        raise Exception('Please select a way of representing the output!')

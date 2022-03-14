@@ -1,13 +1,5 @@
+#!header
 
-.data
-K_cesare: .word 1
-plain_text: .string "abcdefghi"
-.text
-j main
-
-### START HEADERS ###
-
-## (cesare.s)
 cesare_crypt: # a0 stringa (ptr), a1 K -> (in place)
 # registri: a0, a1, a2, a3, a4, t0
 addi sp, sp, -4
@@ -71,35 +63,3 @@ end_loop_cesare_decrypt:
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
-
-## (utils.s)
-modulo: # a0 x, a1 n -> a0 (x%n)
-# registri: a0, a1
-addi sp, sp, -4
-sw ra, 0(sp)
-
-loop_modulo_1:
-bge a0, zero, loop_modulo_2
-add a0, a0, a1
-j loop_modulo_1
-
-loop_modulo_2:
-blt a0, a1, end_modulo
-sub a0, a0, a1
-j loop_modulo_2
-
-end_modulo:
-lw ra, 0(sp)
-addi sp, sp, 4
-jr ra
-### END HEADERS ###
-
-main:
-la a0, plain_text
-lw a1, K_cesare
-
-jal cesare_crypt
-jal cesare_decrypt
-
-li a7, 4 # stampa stringa
-ecall

@@ -1,18 +1,19 @@
 #!main
+#include cesare.s
 #include utils.s
+
 .data
- n: .word 6
+K_cesare: .word 1
+plain_text: .string "abcdefghi"
 .text
 j main
 
-# sei un coglione, questo è semplicemente
-# un for ricorsivo 
-
 main:
-li s1, 1
-lw a0, n
+la a0, plain_text
+lw a1, K_cesare
 
-jal fattoriale
+jal cesare_crypt
+jal cesare_decrypt
 
-li a7, 1
+li a7, 4 # stampa stringa
 ecall

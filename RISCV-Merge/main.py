@@ -103,6 +103,7 @@ if __name__ == "__main__":
 
     out = merge(args.s)
     out = re.sub(r'\n\s*\n', '\n\n', out)
+    out += '\n'
 
     if args.o is not None:
         with open(args.o, 'w') as f:

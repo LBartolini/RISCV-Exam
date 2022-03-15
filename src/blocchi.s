@@ -14,7 +14,7 @@ jal str_len
 addi t1, a0, 0 # len key
 
 lw a0, 0(sp)
-addi sp, sp 4
+addi sp, sp, 4
 
 loop_blocchi_crypt:
 add a3, a0, a2
@@ -70,7 +70,7 @@ jal str_len
 addi t1, a0, 0 # len key
 
 lw a0, 0(sp) # pop a0
-addi sp, sp 4
+addi sp, sp, 4
 
 loop_blocchi_decrypt:
 add a3, a0, a2

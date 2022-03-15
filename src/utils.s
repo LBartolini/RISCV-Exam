@@ -73,3 +73,24 @@ fine_loop_mult:
 add a0, t1, zero
 #! pop_ra
 jr ra 
+
+conta_cifre: # a0 numero -> a0 k cifre
+# Registri: a0, a1, t0, t1, t2
+#! push_ra
+li t0, 1 # contatore
+li a1, 10 # base
+
+loop_conta_cifre:
+blt a0, a1, end_loop_conta_cifre
+
+slli t1, a1, 3
+slli t2, a1, 1
+add a1, t1, t2 # a1*10
+
+addi t0, t0, 1
+j loop_conta_cifre
+end_loop_conta_cifre:
+
+addi a0, t0, 0
+#! pop_ra
+jr ra

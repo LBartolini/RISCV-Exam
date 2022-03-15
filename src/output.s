@@ -2,10 +2,10 @@
 .data
 K_cesare: .word 1
 Key_blocchi: .string "abc"
-Cyper_occorrenze: .word 1000
-prova: .string ""
+Cypher_occorrenze: .word 25000
 
 plain_text: .string "abcabcabc"
+
 .text
 j main
 
@@ -94,6 +94,29 @@ add a0, t1, zero
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra 
+
+conta_cifre: # a0 numero -> a0 k cifre
+# Registri: a0, a1, t0, t1, t2
+addi sp, sp, -4
+sw ra, 0(sp)
+li t0, 1 # contatore
+li a1, 10 # base
+
+loop_conta_cifre:
+blt a0, a1, end_loop_conta_cifre
+
+slli t1, a1, 3
+slli t2, a1, 1
+add a1, t1, t2 # a1*10
+
+addi t0, t0, 1
+j loop_conta_cifre
+end_loop_conta_cifre:
+
+addi a0, t0, 0
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra
 
 #####
 ## (cesare.s)
@@ -284,41 +307,128 @@ jr ra
 #####
 ## (occorrenze.s)
 
-occorrenze_cyper: # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> a0 cyper_text (ptr) (in place)
+occorrenze_crypt: # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> a0 cyper_text (ptr) (in place)
 # Registri: a0, a1, a2, t0
 addi sp, sp, -4
 sw ra, 0(sp)
-li t0, 45 # codice ascii '-'
-#li a2, 4000 # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
-la a2, prova
+li a2, 20000 # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
 
-addi sp, sp, -20
-sw a1, 16(sp) # push a1
-sw a2, 12(sp) # push a2
-sw t0, 8(sp) # push t0
-sw t1, 4(sp) # push t1
-sw t2, 0(sp) # push t2
+addi sp, sp, -12
+sw a1, 8(sp) # push a1
+sw a2, 4(sp) # push a2
+sw t0, 0(sp) # push t0
 
 addi a1, a2, 0
 jal trova_occorrenze_caratteri
 
-lw t2, 0(sp) # pop t2
-lw t1, 4(sp) # pop t1
-lw t0, 8(sp) # pop t0
-lw a2, 12(sp) # pop a2
-lw a1, 16(sp) # pop a1
-addi sp, sp, 20
+lw t0, 0(sp) # pop t0
+lw a2, 4(sp) # pop a2
+lw a1, 8(sp) # pop a1
+addi sp, sp, 12
 
-# TODO Costruire la stringa cypher facendo un doppio for 
-# (esterno caratteri univoci, interno per trovare la posizione di quei caratteri)
-# attenzione a stampare nella stringa la posizione con due cifre come due caratteri separati
+li t1, 0 # indice for caratteri_univoci
+li t5, 0 # indice cypher_text
+for_esterno:
+add t2, a2, t1
+lb a3, 0(t2) # a3 = caratteri_univoci[t1]
+beq a3, zero, end_for_esterno
+
+add t2, a1, t5
+sb a3, 0(t2) # inserisco nel cypher text il carattere corrente
+addi t5, t5, 1
+
+li t3, 0 # indice for_interno (ovvero la posizione nella stringa in chiaro)
+for_interno:
+add t4, a0, t3
+lb a4, 0(t4) # a4 = stringa_in_chiaro[t3]
+beq a4, zero, end_for_interno
+bne a4, a3, continue_for_interno
+
+add t2, a1, t5
+li t0, 45 # codice ascii '-'
+sb t0, 0(t2) # inserisco -
+
+addi sp, sp, -16
+sw a0, 12(sp) # push a0
+sw a1, 8(sp) # push a1
+sw t0, 4(sp) # push t0
+sw t1, 0(sp) # push t1
+
+addi a0, t3, 0
+jal conta_cifre
+addi t2, a0, 0 # numero di cifre di t3 (pos del carattere)
+
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a1, 8(sp)
+lw a0, 12(sp)
+addi sp, sp, 16
+
+addi sp, sp, -8
+sw t3, 4(sp)
+sw t2, 0(sp)
+
+loop_posizione_modulo:
+beq t2, zero, end_loop_posizione_modulo
+
+addi sp, sp, -8
+sw a0, 4(sp) # push a0
+sw a1, 0(sp) # push a1
+
+addi a0, t3, 0
+li a1, 10
+
+jal modulo
+addi t0, a0, 0 # t0 = ultima cifra
+
+lw a1, 0(sp) # pop a1
+lw a0, 4(sp) # pop a0
+addi sp, sp, 8
+
+sub t3, t3, t0 # sottraggo l'ultima cifra
+li t4, 10
+divu t3, t3, t4 # divido per 10
+
+add t4, a1, t5
+add t4, t4, t2
+addi t0, t0, 48 # normalizzazione tabella ascii cifre
+sb t0, 0(t4)
+
+addi t2, t2, -1
+j loop_posizione_modulo
+
+end_loop_posizione_modulo:
+lw t2, 0(sp)
+lw t3, 4(sp)
+addi sp, sp, 8
+
+addi t2, t2, 1
+add t5, t5, t2
+
+continue_for_interno:
+addi t3, t3, 1
+j for_interno
+end_for_interno:
+li t0, 32 # ascii for space
+addi t5, t5, 1
+add t4, a1, t5
+sb t0, 0(t4)
+
+addi t1, t1, 1
+j for_esterno
+end_for_esterno:
+
+li t0, 0 
+addi t5, t5, 1
+add t4, a1, t5
+sb t0, 0(t4)
 
 addi a0, a1, 0
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
 
-occorrenze_decyper: # a0 stringa in chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> a0 stringa in chiaro (ptr) (in place)
+occorrenze_decrypt: # a0 stringa in chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> a0 stringa in chiaro (ptr) (in place)
 # Registri:
 addi sp, sp, -4
 sw ra, 0(sp)
@@ -336,10 +446,10 @@ sw ra, 0(sp)
 li t0, 0 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
 
-loop_occorrenze_cyper:
+loop_occorrenze_crypt:
 add a2, a0, t0
 lb a2, 0(a2) # a2 = stringa[t0]
-beq a2, zero, end_loop_occorrenze_cyper # (while stringa[t0] != 0)
+beq a2, zero, end_loop_occorrenze_crypt # (while stringa[t0] != 0)
 
 addi sp, sp, -16
 sw a0, 12(sp) # push a0
@@ -365,9 +475,9 @@ addi t1, t1, 1
 
 continue_loop:
 addi t0, t0, 1
-j loop_occorrenze_cyper
+j loop_occorrenze_crypt
 
-end_loop_occorrenze_cyper:
+end_loop_occorrenze_crypt:
 add t2, a1, t1
 sb zero, 0(t2)
 lw ra, 0(sp)
@@ -378,9 +488,9 @@ jr ra
 
 main:
 la a0, plain_text
-lw a1, Cyper_occorrenze
+lw a1, Cypher_occorrenze
 
-jal occorrenze_cyper
+jal occorrenze_crypt
 #jal blocchi_decrypt
 
 li a7, 4 # stampa stringa

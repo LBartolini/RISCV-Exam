@@ -2,7 +2,7 @@
 #define procedures.s
 
 occorrenze_crypt: # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> a0 cyper_text (ptr) (in place)
-# Registri: a0, a1, a2, t0
+# Registri: a0, a1, a2, a3, a4, t0, t1, t2, t3, t4, t5
 #! push_ra
 li a2, 20000 # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
 

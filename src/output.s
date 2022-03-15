@@ -493,5 +493,7 @@ lw a1, Cypher_occorrenze
 jal occorrenze_crypt
 #jal blocchi_decrypt
 
-li a7, 4 # stampa stringa
+jal str_len
+
+li a7, 1 # stampa stringa
 ecall

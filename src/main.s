@@ -22,5 +22,9 @@ lw a1, Cypher_occorrenze
 jal occorrenze_crypt
 #jal blocchi_decrypt
 
-li a7, 4 # stampa stringa
+jal str_len
+# problema che la stringa in uscita da occorrenze_crypt è separata da spazi
+# in questo modo è impossibile ciclare sulla stessa
+
+li a7, 1 # stampa stringa
 ecall

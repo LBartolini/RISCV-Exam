@@ -1,21 +1,17 @@
-#!header
-#define procedures.s
+.data
+Cypher_occorrenze: .word 25000
+app_occorrenze: .word 20000
+.text
+# a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place)
+occorrenze_crypt: 
+#! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5
+#! manage_ra
+lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
 
-occorrenze_crypt: # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place)
-# Registri: a0, a1, a2, a3, a4, t0, t1, t2, t3, t4, t5
-#! push_ra
-li a2, 20000 # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
-
-addi sp, sp, -8
-sw a1, 4(sp) # push a1
-sw a2, 0(sp) # push a2
-
+#! precall(trova_occorrenze_caratteri)
 addi a1, a2, 0
 jal trova_occorrenze_caratteri
-
-lw a2, 0(sp) # pop a2
-lw a1, 4(sp) # pop a1
-addi sp, sp, 8
+#! postcall(trova_occorrenze_caratteri)
 
 li t0, 32 # space
 sb t0, 0(a1)
@@ -42,21 +38,11 @@ add t2, a1, t5
 li t0, 45 # codice ascii '-'
 sb t0, 0(t2) # inserisco -
 
-addi sp, sp, -16
-sw a0, 12(sp) # push a0
-sw a1, 8(sp) # push a1
-sw t0, 4(sp) # push t0
-sw t1, 0(sp) # push t1
-
+#! precall(conta_cifre)
 addi a0, t3, 0
 jal conta_cifre
 addi t2, a0, 0 # numero di cifre di t3 (pos del carattere)
-
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+#! postcall(conta_cifre)
 
 addi sp, sp, -8
 sw t3, 4(sp)
@@ -65,19 +51,12 @@ sw t2, 0(sp)
 loop_posizione_modulo:
 beq t2, zero, end_loop_posizione_modulo
 
-addi sp, sp, -8
-sw a0, 4(sp) # push a0
-sw a1, 0(sp) # push a1
-
+#! precall(modulo)
 addi a0, t3, 0
 li a1, 10
-
 jal modulo
 addi t0, a0, 0 # t0 = ultima cifra
-
-lw a1, 0(sp) # pop a1
-lw a0, 4(sp) # pop a0
-addi sp, sp, 8
+#! postcall(modulo)
 
 sub t3, t3, t0 # sottraggo l'ultima cifra
 li t4, 10
@@ -116,9 +95,7 @@ li t0, 0
 addi t5, t5, -1
 add t4, a1, t5
 sb t0, 0(t4)
-
-#! pop_ra
-jr ra
+#! end
 
 
 # scorrere il cypher text dalla fine verso l'inizio
@@ -128,21 +105,18 @@ jr ra
 # prosegue fino a quando il carattere successivo è uno spazio, in tal caso il carattere attuale è il carattere da posizionare nella stringa in chiaro
 # si esegue un for per le volte del contatore, ogni volta si fa il pop dalla stack e si mette il carattere nella posizione a0[pop()]
 # finisce il ciclo esterno quando l'indirizzo attuale è l'indirizzo iniziale
-occorrenze_decrypt: # a0 stringa in chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place)
-# Registri:
-#! push_ra
+# a0 stringa in chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place)
+occorrenze_decrypt: 
+#! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3 t4
+#! manage_ra
 li t4, 0 # contatore di quanti numeri ho pushato nella stack
 li a5, 1
 
-addi sp, sp, -4
-sw a0, 0(sp)
-
+#! precall(str_len)
 addi a0, a1, 0
 jal str_len
 addi a2, a0, 0
-
-lw a0, 0(sp)
-addi sp, sp, 4
+#! postcall(str_len)
 
 add a2, a1, a2 # a2 contiene l'indirizzo dell'ultimo carattere del cypher_text
 addi a2, a2, -1 # altrimenti comincerebbe dallo 0
@@ -182,41 +156,21 @@ beq a3, t2, push_numero_stack_occorrenze # se trovo un '-' devo pushare il numer
 
 addi a3, a3, -48 # riconverto la cifra in ascii a decimale
 
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-
+#! precall(mult)
 addi a0, a3, 0 # cifra
 addi a1, a5, 0 # 1/10/100/...
 jal mult
 addi t2, a0, 0
-
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+#! postcall(mult)
 
 add a4, a4, t2 # incremento la somma parziale
 
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-
+#! precall(mult)
 li a0, 10
 addi a1, a5, 0 # 1/10/100/...
 jal mult # moltiplico per 10 il fattore parziale che moltiplica le cifre
 addi a5, a0, 0
-
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+#! postcall(mult)
 
 j incr_loop_occorrenze_decrypt
 
@@ -232,12 +186,12 @@ addi a2, a2, -1
 j loop_occorrenze_decrypt
 
 fine_occorrenze_decrypt:
-#! pop_ra
-jr ra
+#! end
 
-trova_occorrenze_caratteri: # a0 stringa, a1, appoggio -> (in place)
-# Registri: a0, a1, a2, t0, t1, t2
-#! push_ra
+# a0 stringa, a1, appoggio -> (in place)
+trova_occorrenze_caratteri:
+#! a0 a1 a2 t0 t1 t2 t3
+#! manage_ra
 li t0, 0 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
 
@@ -246,26 +200,16 @@ add a2, a0, t0
 lb a2, 0(a2) # a2 = stringa[t0]
 beq a2, zero, end_loop_occorrenze_crypt # (while stringa[t0] != 0)
 
-addi sp, sp, -16
-sw a0, 12(sp) # push a0
-sw a1, 8(sp) # push a1
-sw t0, 4(sp) # push t0
-sw t1, 0(sp) # push t1
-
+#! precall(check_char_in_string)
 addi a0, a1, 0
 addi a1, a2, 0
 jal check_char_in_string
-addi t2, a0, 0
+addi t3, a0, 0
+#! postcall(check_char_in_string)
 
-lw t1, 0(sp) # pop t1
-lw t0, 4(sp) # pop t0
-lw a1, 8(sp) # pop a1
-lw a0, 12(sp) # pop a0
-addi sp, sp, 16
-
-bgt t2, zero, continue_loop
-add t2, a1, t1
-sb a2, 0(t2)
+bgt t3, zero, continue_loop
+add t3, a1, t1
+sb a2, 0(t3)
 addi t1, t1, 1
 
 continue_loop:
@@ -275,5 +219,4 @@ j loop_occorrenze_crypt
 end_loop_occorrenze_crypt:
 add t2, a1, t1
 sb zero, 0(t2)
-#! pop_ra
-jr ra
+#! end

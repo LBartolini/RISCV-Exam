@@ -1,9 +1,8 @@
-#!header
-#define procedures.s
-
-modulo: # a0 x, a1 n -> a0 (x%n)
-# registri: a0, a1
-#! push_ra
+.text
+# a0 x, a1 n -> a0 (x%n)
+modulo:
+#! a0 a1
+#! manage_ra 
 
 loop_modulo_1:
 bge a0, zero, loop_modulo_2
@@ -16,12 +15,12 @@ sub a0, a0, a1
 j loop_modulo_2
 
 end_modulo:
-#! pop_ra
-jr ra
+#! end
 
-str_len: # a0 stringa (ptr) -> a0 len
-# registri: a0, t0, t1, t2
-#! push_ra
+# a0 stringa (ptr) -> a0 len
+str_len:
+#! a0 t0 t1 t2
+#! manage_ra
 li t1, 0
 
 loop_str_len:
@@ -33,12 +32,12 @@ j loop_str_len
 
 end_str_len:
 addi a0, t1, 0
-#! pop_ra
-jr ra
+#! end
 
-check_char_in_string: # a0 stringa, a1 char -> a0 boolean (char in stringa) (0 f, 1 t)
-# Registri: a0, a1, t0, t1, t2
-#! push_ra
+# a0 stringa, a1 char -> a0 boolean (char in stringa) (0 f, 1 t)
+check_char_in_string:
+#! a0 a1 t0 t1 t2
+#! manage_ra
 li t0, 0 # indice for
 li t2, 0 # boolean return value
 
@@ -55,12 +54,12 @@ li t2, 1
 
 end_loop_check_char:
 addi a0, t2, 0
-#! pop_ra
-jr ra
+#! end
 
-mult: # a0 x, a1 y -> a0 (x*y)
-# Registri: a0, a1, t0, t1
-#! push_ra
+# a0 x, a1 y -> a0 (x*y)
+mult: 
+#! a0 a1 t0 t1
+#! manage_ra
 li t0, 0
 li t1, 0
 loop_mult:
@@ -71,12 +70,12 @@ j loop_mult
 
 fine_loop_mult:
 add a0, t1, zero
-#! pop_ra
-jr ra 
+#! end
 
-conta_cifre: # a0 numero -> a0 k cifre
-# Registri: a0, a1, t0, t1, t2
-#! push_ra
+# a0 numero -> a0 k cifre
+conta_cifre: 
+#! a0 a1 t0 t1 t2
+#! manage_ra
 li t0, 1 # contatore
 li a1, 10 # base
 
@@ -92,5 +91,4 @@ j loop_conta_cifre
 end_loop_conta_cifre:
 
 addi a0, t0, 0
-#! pop_ra
-jr ra
+#! end

@@ -1,19 +1,12 @@
-#!main
-#include utils.s
-#include cesare.s
-#include blocchi.s
-#include occorrenze.s
-#define procedures.s
+#! main
+#!include utils.s
+#!include cesare.s
+#!include blocchi.s
+#!include occorrenze.s
 
 .data
-K_cesare: .word 1
-Key_blocchi: .string "abc"
-Cypher_occorrenze: .word 25000
-
-plain_text: .string "abcabcabcabcabcabcabcabcabcabcabcabc"
+plain_text: .string "abc"
 .text
-j main
-
 main:
 la a0, plain_text
 lw a1, Cypher_occorrenze
@@ -23,3 +16,4 @@ jal occorrenze_decrypt
 
 li a7, 4 # stampa stringa
 ecall
+#! end

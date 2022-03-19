@@ -4,7 +4,7 @@ app_occorrenze: .word 20000
 .text
 # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place)
 occorrenze_crypt: 
-#! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5
+#! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5 t6
 #! manage_ra
 lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
 
@@ -41,15 +41,15 @@ sb t0, 0(t2) # inserisco -
 #! precall(conta_cifre)
 addi a0, t3, 0
 jal conta_cifre
-addi t2, a0, 0 # numero di cifre di t3 (pos del carattere)
+addi t6, a0, 0 # numero di cifre di t3 (pos del carattere)
 #! postcall(conta_cifre)
 
 addi sp, sp, -8
 sw t3, 4(sp)
-sw t2, 0(sp)
+sw t6, 0(sp)
 
 loop_posizione_modulo:
-beq t2, zero, end_loop_posizione_modulo
+beq t6, zero, end_loop_posizione_modulo
 
 #! precall(modulo)
 addi a0, t3, 0
@@ -63,11 +63,11 @@ li t4, 10
 divu t3, t3, t4 # divido per 10
 
 add t4, a1, t5
-add t4, t4, t2
+add t4, t4, t6
 addi t0, t0, 48 # normalizzazione tabella ascii cifre
 sb t0, 0(t4)
 
-addi t2, t2, -1
+addi t6, t6, -1
 j loop_posizione_modulo
 
 end_loop_posizione_modulo:

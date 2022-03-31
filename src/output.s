@@ -1,5 +1,5 @@
 .data
-plain_text: .string "LAUREATO"
+plain_text: .string "pippoplutopaperino"
 K_cesare: .word -2
 Key_blocchi: .string "OLE"
 Cypher_occorrenze: .word 25000
@@ -178,7 +178,7 @@ sw t1, 4(sp)
 sw t2, 0(sp)
 addi a0, a1, 0
 jal str_len
-addi t1, a0, 0 # len key
+addi t3, a0, 0 # len key
 lw t2, 0(sp)
 lw t1, 4(sp)
 lw t0, 8(sp)
@@ -190,13 +190,14 @@ lb a4, 0(a3) # stringa[a2]
 addi sp, sp, -8
 sw a0, 4(sp)
 sw a1, 0(sp)
-add a0, a2, t1
-li a1, 256
+addi a0, a2, 0
+addi a1, t3, 0
 jal modulo
 addi t2, a0, 0
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+add t2, t2, a1
 lb a5, 0(t2) # key[a2%len(key)]
 beq a4, zero, end_loop_blocchi_crypt
 addi sp, sp, -8
@@ -228,7 +229,7 @@ sw t1, 4(sp)
 sw t2, 0(sp)
 addi a0, a1, 0
 jal str_len
-addi t1, a0, 0 # len key
+addi t3, a0, 0 # len key
 lw t2, 0(sp)
 lw t1, 4(sp)
 lw t0, 8(sp)
@@ -240,13 +241,14 @@ lb a4, 0(a3) # stringa[a2]
 addi sp, sp, -8
 sw a0, 4(sp)
 sw a1, 0(sp)
-add a0, a2, t1
-li a1, 256
+addi a0, a2, 0
+addi a1, t3, 0
 jal modulo
 addi t2, a0, 0
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+add t2, t2, a1
 lb a5, 0(t2) # key[a2%len(key)]
 beq a4, zero, end_loop_blocchi_decrypt
 addi sp, sp, -8
@@ -500,10 +502,48 @@ sb zero, 0(t2)
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
+inversione_stringa:
+addi sp, sp, -4
+sw ra, 0(sp)
+addi sp, sp, -16
+sw a0, 12(sp)
+sw t0, 8(sp)
+sw t1, 4(sp)
+sw t2, 0(sp)
+jal str_len
+addi a1, a0, 0
+lw t2, 0(sp)
+lw t1, 4(sp)
+lw t0, 8(sp)
+lw a0, 12(sp)
+addi sp, sp, 16
+srli a2, a1, 1 # divido per due per sapere quando fermarmi
+li t0, 0 # indice per scorrere la stringa
+loop_inversione_stringa:
+beq t0, a2, fine_inversione_stringa
+add t1, a0, t0
+lb a3, 0(t1) # a3 = stringa[t0]
+add t1, a0, a1
+sub t1, t1, t0
+addi t1, t1, -1
+lb a4, 0(t1) # a4 = stringa[len(stringa)-t0]
+# swap dei due caratteri opposti
+add t1, a0, t0
+sb a4, 0(t1) 
+add t1, a0, a1
+sub t1, t1, t0
+addi t1, t1, -1
+sb a3, 0(t1)
+addi t0, t0, 1
+j loop_inversione_stringa
+fine_inversione_stringa:
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra
 main:
 la a0, plain_text
-lw a1, Key_blocchi
-jal blocchi_crypt
-#jal blocchi_decrypt
+# la a1, Key_blocchi
+jal inversione_stringa
+jal inversione_stringa
 li a7, 4 # stampa stringa
 ecall

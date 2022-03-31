@@ -1,4 +1,3 @@
-.data
 .text
 
 # a0 stringa (ptr) -> (in place)

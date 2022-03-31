@@ -1,5 +1,5 @@
 .data
-Key_blocchi: .string "abc"
+Key_blocchi: .string "OLE"
 .text
 # a0 stringa (ptr), a1 key (ptr) -> (in place)
 blocchi_crypt: 
@@ -29,11 +29,12 @@ beq a4, zero, end_loop_blocchi_crypt
 
 #! precall(modulo)
 add a0, a4, a5
-li a1, 256
+li a1, 96
 jal modulo
 addi t0, a0, 0
 #! postcall(modulo)
 
+addi t0, t0, 32
 sb t0, 0(a3)
 addi a2, a2, 1
 j loop_blocchi_crypt
@@ -68,11 +69,11 @@ beq a4, zero, end_loop_blocchi_decrypt
 
 #! precall(modulo)
 sub a0, a4, a5
-li a1, 256
+addi a0, a0, -32
+li a1, 96
 jal modulo
 addi t0, a0, 0
 #! postcall(modulo)
-
 sb t0, 0(a3)
 addi a2, a2, 1
 j loop_blocchi_decrypt

@@ -1,7 +1,7 @@
 .data
-plain_text: .string "AMO AssEMBLY"
+plain_text: .string "LAUREATO"
 K_cesare: .word -2
-Key_blocchi: .string "abc"
+Key_blocchi: .string "OLE"
 Cypher_occorrenze: .word 25000
 app_occorrenze: .word 20000
 .text
@@ -203,12 +203,13 @@ addi sp, sp, -8
 sw a0, 4(sp)
 sw a1, 0(sp)
 add a0, a4, a5
-li a1, 256
+li a1, 96
 jal modulo
 addi t0, a0, 0
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+addi t0, t0, 32
 sb t0, 0(a3)
 addi a2, a2, 1
 j loop_blocchi_crypt
@@ -252,7 +253,8 @@ addi sp, sp, -8
 sw a0, 4(sp)
 sw a1, 0(sp)
 sub a0, a4, a5
-li a1, 256
+addi a0, a0, -32
+li a1, 96
 jal modulo
 addi t0, a0, 0
 lw a1, 0(sp)
@@ -500,8 +502,8 @@ addi sp, sp, 4
 jr ra
 main:
 la a0, plain_text
-lw a1, K_cesare
-jal cesare_crypt
-jal cesare_decrypt
+lw a1, Key_blocchi
+jal blocchi_crypt
+#jal blocchi_decrypt
 li a7, 4 # stampa stringa
 ecall

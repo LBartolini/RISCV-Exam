@@ -1,6 +1,6 @@
 .data
-plain_text: .string "abc"
-K_cesare: .word 1
+plain_text: .string "AMOAssEMBLY"
+K_cesare: .word -2
 Key_blocchi: .string "abc"
 Cypher_occorrenze: .word 25000
 app_occorrenze: .word 20000
@@ -95,17 +95,32 @@ loop_cesare_crypt:
 add a3, a0, a2
 lb a4, 0(a3) # stringa[a2]
 beq a4, zero, end_loop_cesare_crypt
+li t1, 122
+bgt a4, t1, cesare_crypt_next_check
+li t1, 97
+bge a4, t1, cesare_crypt_preparation
+cesare_crypt_next_check:
+li t1, 90
+bgt a4, t1, cesare_crypt_incr
+li t1, 65
+bge a4, t1, cesare_crypt_preparation
+j cesare_crypt_incr
+cesare_crypt_preparation:
+sub a4, a4, t1
+cesare_crypt_save:
 addi sp, sp, -8
 sw a0, 4(sp)
 sw a1, 0(sp)
 add a0, a4, a1
-li a1, 256
+li a1, 26
 jal modulo
 addi t0, a0, 0
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+add t0, t0, t1
 sb t0, 0(a3)
+cesare_crypt_incr:
 addi a2, a2, 1
 j loop_cesare_crypt
 end_loop_cesare_crypt:
@@ -470,8 +485,8 @@ addi sp, sp, 4
 jr ra
 main:
 la a0, plain_text
-lw a1, Cypher_occorrenze
-jal occorrenze_crypt
-jal occorrenze_decrypt
+lw a1, K_cesare
+jal cesare_crypt
+#jal cesare_decrypt
 li a7, 4 # stampa stringa
 ecall

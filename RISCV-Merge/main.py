@@ -59,6 +59,8 @@ def preprocess(source_path, directory=None, imported=False, prepare=True, entry_
         elif l.strip().startswith('.data'):
             in_data = True
         elif in_data and ':' in l:
+            # TODO fixare bug spazio nella stringa nei dati
+            # print(l.strip().split(" "))
             name, _type, value = l.strip().split(' ')
             var = Variable(name, _type, value)
             program.add_variable(var)

@@ -5,14 +5,14 @@
 #!include occorrenze.s
 
 .data
-plain_text: .string "abc"
+plain_text: .string "AMOAssEMBLY"
 .text
 main:
 la a0, plain_text
-lw a1, Cypher_occorrenze
+lw a1, K_cesare
 
-jal occorrenze_crypt
-jal occorrenze_decrypt
+jal cesare_crypt
+#jal cesare_decrypt
 
 li a7, 4 # stampa stringa
 ecall

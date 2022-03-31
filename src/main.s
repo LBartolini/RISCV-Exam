@@ -5,11 +5,11 @@
 #!include occorrenze.s
 
 .data
-plain_text: .string "LAUREATO"
+plain_text: .string "pippo"
 .text
 main:
 la a0, plain_text
-lw a1, Key_blocchi
+la a1, Key_blocchi
 
 jal blocchi_crypt
 jal blocchi_decrypt

@@ -262,6 +262,10 @@ addi t0, a0, 0
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+li t1, 32
+bge t0, t1, blocchi_decrypt_save
+addi t0, t0, 96
+blocchi_decrypt_save:
 sb t0, 0(a3)
 addi a2, a2, 1
 j loop_blocchi_decrypt
@@ -592,8 +596,8 @@ addi sp, sp, 4
 jr ra
 main:
 la a0, plain_text
-# la a1, Key_blocchi
-jal dizionario
-jal dizionario
+la a1, Key_blocchi
+jal blocchi_crypt
+jal blocchi_decrypt
 li a7, 4 # stampa stringa
 ecall

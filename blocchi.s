@@ -74,6 +74,12 @@ li a1, 96
 jal modulo
 addi t0, a0, 0
 #! postcall(modulo)
+
+li t1, 32
+bge t0, t1, blocchi_decrypt_save
+addi t0, t0, 96
+
+blocchi_decrypt_save:
 sb t0, 0(a3)
 addi a2, a2, 1
 j loop_blocchi_decrypt

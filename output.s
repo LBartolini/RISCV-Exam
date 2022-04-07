@@ -315,51 +315,9 @@ bne a4, a3, continue_for_interno
 add t2, a1, t5
 li t0, 45 # codice ascii '-'
 sb t0, 0(t2) # inserisco -
-addi sp, sp, -20
-sw a0, 16(sp)
-sw a1, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
-addi a0, t3, 0
-jal conta_cifre
-addi t6, a0, 0 # numero di cifre di t3 (pos del carattere)
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a1, 12(sp)
-lw a0, 16(sp)
-addi sp, sp, 20
-addi sp, sp, -8
-sw t3, 4(sp)
-sw t6, 0(sp)
-loop_posizione_modulo:
-beq t6, zero, end_loop_posizione_modulo
-addi sp, sp, -8
-sw a0, 4(sp)
-sw a1, 0(sp)
-addi a0, t3, 0
-li a1, 10
-jal modulo
-addi t0, a0, 0 # t0 = ultima cifra
-lw a1, 0(sp)
-lw a0, 4(sp)
-addi sp, sp, 8
-sub t3, t3, t0 # sottraggo l'ultima cifra
-li t4, 10
-divu t3, t3, t4 # divido per 10
-add t4, a1, t5
-add t4, t4, t6
-addi t0, t0, 48 # normalizzazione tabella ascii cifre
-sb t0, 0(t4)
-addi t6, t6, -1
-j loop_posizione_modulo
-end_loop_posizione_modulo:
-lw t2, 0(sp)
-lw t3, 4(sp)
-addi sp, sp, 8
-addi t2, t2, 1
-add t5, t5, t2
+addi t3, t3, 1 # per evitare l'errore della posizione zero
+sb t3, 1(t2) # inserisco la posizione del carattere come numero puro
+addi t5, t5, 2 
 continue_for_interno:
 addi t3, t3, 1
 j for_interno
@@ -471,8 +429,15 @@ jr ra
 trova_occorrenze_caratteri:
 addi sp, sp, -4
 sw ra, 0(sp)
-li t0, 0 # indice for stringa
+li t0, 2 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
+lb t2, 1(a0) # carico in t2 il carattere in posizione 1
+sb t2, 0(a1) # lo inserisco in prima posizione dell'appoggio
+addi t1, t1, 1
+lb t3, 0(a0) # carico in t3 il carattere in pos 0
+beq t2, t3, loop_occorrenze_crypt # se è uguale a quello in posizione 0 allora salto al ciclo
+sb t3, 1(a1) # altrimenti lo salvo in posizione 1 dell'appoggio
+addi t1, t1, 1
 loop_occorrenze_crypt:
 add a2, a0, t0
 lb a2, 0(a2) # a2 = stringa[t0]
@@ -596,8 +561,9 @@ addi sp, sp, 4
 jr ra
 main:
 la a0, plain_text
-la a1, Key_blocchi
-jal blocchi_crypt
-jal blocchi_decrypt
+la a1, Cypher_occorrenze
+jal occorrenze_crypt
+#jal blocchi_decrypt
+addi a0, a1, 0
 li a7, 4 # stampa stringa
 ecall

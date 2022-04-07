@@ -11,11 +11,12 @@ plain_text: .string "pippoplutopaperino"
 .text
 main:
 la a0, plain_text
-la a1, Key_blocchi
+la a1, Cypher_occorrenze
 
-jal blocchi_crypt
-jal blocchi_decrypt
+jal occorrenze_crypt
+#jal blocchi_decrypt
 
+addi a0, a1, 0
 li a7, 4 # stampa stringa
 ecall
 #! end

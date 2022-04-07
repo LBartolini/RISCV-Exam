@@ -339,88 +339,24 @@ jr ra
 occorrenze_decrypt:
 addi sp, sp, -4
 sw ra, 0(sp)
-li t4, 0 # contatore di quanti numeri ho pushato nella stack
-li a5, 1
-addi sp, sp, -16
-sw a0, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
-addi a0, a1, 0
-jal str_len
-addi a2, a0, 0
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
-add a2, a1, a2 # a2 contiene l'indirizzo dell'ultimo carattere del cypher_text
-addi a2, a2, -1 # altrimenti comincerebbe dallo 0
-addi a1, a1, 1 # così il ciclo sotto si ferma al punto giusto
+li a2, 2 # indice cypher_text
+lb a3, 0(a1) # a3 contiene il carattere corrente (all'inizio il primo carattere)
+li a4, 32 # ascii for 'space'
 loop_occorrenze_decrypt:
-blt a2, a1, fine_occorrenze_decrypt # ciclo finchè la posizione a sinistra fa parte della stringa
-lb a3, 0(a2) # a3 carattere corrente
-lb t0, 1(a2) # carattere a destra
-lb t1, -1(a2) # carattere a sinistra
-li t2, 45 # ascii '-'
-li t3, 32 # ascii 'space'
-bne t1, t3, pass_occorrenze_decrypt
-bne t0, t2, pass_occorrenze_decrypt
-# se entro qui significa che ho trovato un carattere 
-# e devo inserirlo nella stringa in chiaro
-# per farlo fai un ciclo che parte da t4 e finisce a zero
-loop_inserimento_numeri_occorrenze:
-beq t4, zero, end_inserimento_numeri_occorrenze
-lw t2, 0(sp) # pop del numero
-addi sp, sp, 4
-add t2, t2, a0 # t2 posizione in cui mettere il carattere a3
-sb a3, 0(t2)
-addi t4, t4, -1
-j loop_inserimento_numeri_occorrenze
-end_inserimento_numeri_occorrenze:
-addi a2, a2, -1 # scorro un carattere in più per saltare lo spazio nel mezzo alle codifiche
+add t0, a1, a2
+lb t1, 0(t0) # t1 carattere corrente del cypher_text
+lb t2, 1(t0) # t2 carattere successivo, usato per terminare il ciclo
+lb t3, -1(t0) # t3 carattere precedente, usato per controllare se cambia il carattere corrente
+beq t2, zero, fine_occorrenze_decrypt
+beq t3, a4, nuovo_carattere_corrente
+addi t1, t1, -1 # per fare pari con il +1 durante il crypt
+add a5, a0, t1
+sb a3, 0(a5)
 j incr_loop_occorrenze_decrypt
-pass_occorrenze_decrypt:
-beq a3, t2, push_numero_stack_occorrenze # se trovo un '-' devo pushare il numero (a4) nella stack
-addi a3, a3, -48 # riconverto la cifra in ascii a decimale
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-addi a0, a3, 0 # cifra
-addi a1, a5, 0 # 1/10/100/...
-jal mult
-addi t2, a0, 0
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
-add a4, a4, t2 # incremento la somma parziale
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-li a0, 10
-addi a1, a5, 0 # 1/10/100/...
-jal mult # moltiplico per 10 il fattore parziale che moltiplica le cifre
-addi a5, a0, 0
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
-j incr_loop_occorrenze_decrypt
-push_numero_stack_occorrenze:
-addi sp, sp, -4
-sw a4, 0(sp)
-addi t4, t4, 1 # incremento il contatore dei numeri nella stack
-li a5, 1 # a5 è il valore con cui moltiplico la cifra attuale dei numeri
-li a4, 0 # a4 è la somma parziale del numero
+nuovo_carattere_corrente:
+addi a3, t3, 0
 incr_loop_occorrenze_decrypt:
-addi a2, a2, -1
+addi a2, a2, 2
 j loop_occorrenze_decrypt
 fine_occorrenze_decrypt:
 lw ra, 0(sp)
@@ -563,7 +499,6 @@ main:
 la a0, plain_text
 la a1, Cypher_occorrenze
 jal occorrenze_crypt
-#jal blocchi_decrypt
-addi a0, a1, 0
+jal occorrenze_decrypt
 li a7, 4 # stampa stringa
 ecall

@@ -14,9 +14,8 @@ la a0, plain_text
 la a1, Cypher_occorrenze
 
 jal occorrenze_crypt
-#jal blocchi_decrypt
+jal occorrenze_decrypt
 
-addi a0, a1, 0
 li a7, 4 # stampa stringa
 ecall
 #! end

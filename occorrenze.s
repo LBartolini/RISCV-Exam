@@ -5,7 +5,7 @@ app_2_occorrenze: .word 30000
 .text
 # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place su cypher_text) (restituisce in a0 <- a1)
 occorrenze_crypt: 
-#! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5 t6
+#! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3 t4 t5 t6
 #! manage_ra
 lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
 lw a5, app_2_occorrenze

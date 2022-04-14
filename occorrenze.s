@@ -188,12 +188,21 @@ j loop_occorrenze_decrypt
 fine_occorrenze_decrypt:
 #! end
 
-# a0 stringa, a1, appoggio -> (in place)
+# a0 stringa, a1 appoggio -> (in place)
 trova_occorrenze_caratteri:
 #! a0 a1 a2 t0 t1 t2 t3
 #! manage_ra
-li t0, 0 # indice for stringa
+li t0, 2 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
+
+lb t2, 1(a0) # carico in t2 il carattere in posizione 1
+sb t2, 0(a1) # lo inserisco in prima posizione dell'appoggio
+addi t1, t1, 1
+
+lb t3, 0(a0) # carico in t3 il carattere in pos 0
+beq t2, t3, loop_occorrenze_crypt # se è uguale a quello in posizione 0 allora salto al ciclo
+sb t3, 1(a1) # altrimenti lo salvo in posizione 1 dell'appoggio
+addi t1, t1, 1
 
 loop_occorrenze_crypt:
 add a2, a0, t0

@@ -471,8 +471,15 @@ jr ra
 trova_occorrenze_caratteri:
 addi sp, sp, -4
 sw ra, 0(sp)
-li t0, 0 # indice for stringa
+li t0, 2 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
+lb t2, 1(a0) # carico in t2 il carattere in posizione 1
+sb t2, 0(a1) # lo inserisco in prima posizione dell'appoggio
+addi t1, t1, 1
+lb t3, 0(a0) # carico in t3 il carattere in pos 0
+beq t2, t3, loop_occorrenze_crypt # se è uguale a quello in posizione 0 allora salto al ciclo
+sb t3, 1(a1) # altrimenti lo salvo in posizione 1 dell'appoggio
+addi t1, t1, 1
 loop_occorrenze_crypt:
 add a2, a0, t0
 lb a2, 0(a2) # a2 = stringa[t0]
@@ -596,8 +603,9 @@ addi sp, sp, 4
 jr ra
 main:
 la a0, plain_text
-la a1, Key_blocchi
-jal blocchi_crypt
-jal blocchi_decrypt
+la a1, Cypher_occorrenze
+jal occorrenze_crypt
+#jal occorrenze_decrypt
+addi a0, a1, 0
 li a7, 4 # stampa stringa
 ecall

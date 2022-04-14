@@ -1,5 +1,5 @@
 .data
-Key_blocchi: .string "OLE"
+blocKey: .string "OLE"
 .text
 # a0 stringa (ptr), a1 key (ptr) -> (in place)
 blocchi_crypt: 

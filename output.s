@@ -1,12 +1,12 @@
 .data
-myplaintext: .string "ABCDEFGH"
-mycypher: .string "ABDE"
+myplaintext: .string "pippoFromIbiza"
+mycypher: .string "ADB"
 new_line: .string "\n"
 sostK: .word 1
 blocKey: .string "OLE"
-Cypher_occorrenze_1: .word 25000
-Cypher_occorrenze_2: .word 35000
+Cypher_occorrenze: .word 40000
 app_occorrenze: .word 20000
+app_2_occorrenze: .word 30000
 .text
 j main
 modulo:
@@ -87,6 +87,24 @@ addi t0, t0, 1
 j loop_conta_cifre
 end_loop_conta_cifre:
 addi a0, t0, 0
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra
+str_copy:
+addi sp, sp, -4
+sw ra, 0(sp)
+li t0, 0 # indice che scorre la stringa sorgente
+loop_str_copy:
+add t1, a1, t0
+lb t1, 0(t1) # t1 = sorg[t0]
+beq t1, zero, end_str_copy
+add t2, t0, a0
+sb t1, 0(t2)
+addi t0, t0, 1
+j loop_str_copy
+end_str_copy:
+add t2, a0, t0
+sb t1, 0(t2) # inserisco lo 0 in fondo alla stringa dest a0
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -280,6 +298,7 @@ occorrenze_crypt:
 addi sp, sp, -4
 sw ra, 0(sp)
 lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+lw a5, app_2_occorrenze
 addi sp, sp, -28
 sw a0, 24(sp)
 sw a1, 20(sp)
@@ -299,14 +318,14 @@ lw a1, 20(sp)
 lw a0, 24(sp)
 addi sp, sp, 28
 li t0, 32 # space
-sb t0, 0(a1)
+sb t0, 0(a5)
 li t1, 0 # indice for caratteri_univoci
 li t5, 1 # indice cypher_text
 for_esterno:
 add t2, a2, t1
 lb a3, 0(t2) # a3 = caratteri_univoci[t1]
 beq a3, zero, end_for_esterno
-add t2, a1, t5
+add t2, a5, t5
 sb a3, 0(t2) # inserisco nel cypher text il carattere corrente
 addi t5, t5, 1
 li t3, 0 # indice for_interno (ovvero la posizione nella stringa in chiaro)
@@ -315,7 +334,7 @@ add t4, a0, t3
 lb a4, 0(t4) # a4 = stringa_in_chiaro[t3]
 beq a4, zero, end_for_interno
 bne a4, a3, continue_for_interno
-add t2, a1, t5
+add t2, a5, t5
 li t0, 45 # codice ascii '-'
 sb t0, 0(t2) # inserisco -
 addi sp, sp, -20
@@ -351,7 +370,7 @@ addi sp, sp, 8
 sub t3, t3, t0 # sottraggo l'ultima cifra
 li t4, 10
 divu t3, t3, t4 # divido per 10
-add t4, a1, t5
+add t4, a5, t5
 add t4, t4, t6
 addi t0, t0, 48 # normalizzazione tabella ascii cifre
 sb t0, 0(t4)
@@ -368,7 +387,7 @@ addi t3, t3, 1
 j for_interno
 end_for_interno:
 li t0, 32 # ascii for space
-add t4, a1, t5
+add t4, a5, t5
 sb t0, 0(t4)
 addi t5, t5, 1
 addi t1, t1, 1
@@ -376,8 +395,23 @@ j for_esterno
 end_for_esterno:
 li t0, 0
 addi t5, t5, -1
-add t4, a1, t5
+add t4, a5, t5
 sb t0, 0(t4)
+addi sp, sp, -20
+sw a0, 16(sp)
+sw a1, 12(sp)
+sw t0, 8(sp)
+sw t1, 4(sp)
+sw t2, 0(sp)
+addi a0, a1, 0
+addi a1, a5, 0
+jal str_copy
+lw t2, 0(sp)
+lw t1, 4(sp)
+lw t0, 8(sp)
+lw a1, 12(sp)
+lw a0, 16(sp)
+addi sp, sp, 20
 addi a0, a1, 0
 lw ra, 0(sp)
 addi sp, sp, 4
@@ -387,6 +421,8 @@ addi sp, sp, -4
 sw ra, 0(sp)
 li t4, 0 # contatore di quanti numeri ho pushato nella stack
 li a5, 1
+li t6, 0 # caratteri inseriti nella stringa_in_chiaro
+lw a6, app_occorrenze # appoggio dove inserire la stringa_in_chiaro appena decifrata
 addi sp, sp, -16
 sw a0, 12(sp)
 sw t0, 8(sp)
@@ -401,7 +437,7 @@ lw t0, 8(sp)
 lw a0, 12(sp)
 addi sp, sp, 16
 add a2, a1, a2 # a2 contiene l'indirizzo dell'ultimo carattere del cypher_text
-addi a2, a2, -1 # altrimenti comincerebbe dallo 0
+addi a2, a2, -1 # (altrimenti comincerebbe dallo 0)
 addi a1, a1, 1 # così il ciclo sotto si ferma al punto giusto
 loop_occorrenze_decrypt:
 blt a2, a1, fine_occorrenze_decrypt # ciclo finchè la posizione a sinistra fa parte della stringa
@@ -419,8 +455,9 @@ loop_inserimento_numeri_occorrenze:
 beq t4, zero, end_inserimento_numeri_occorrenze
 lw t2, 0(sp) # pop del numero
 addi sp, sp, 4
-add t2, t2, a0 # t2 posizione in cui mettere il carattere a3
+add t2, t2, a6 # t2 posizione in cui mettere il carattere a3
 sb a3, 0(t2)
+addi t6, t6, 1
 addi t4, t4, -1
 j loop_inserimento_numeri_occorrenze
 end_inserimento_numeri_occorrenze:
@@ -469,6 +506,10 @@ incr_loop_occorrenze_decrypt:
 addi a2, a2, -1
 j loop_occorrenze_decrypt
 fine_occorrenze_decrypt:
+add t0, a6, t6
+sb zero, 0(t0) # inserisco 0 in fondo alla stringa_in_chiaro
+addi a1, a6, 0
+jal str_copy 
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -513,7 +554,7 @@ addi t0, t0, 1
 j loop_occorrenze_crypt
 end_loop_occorrenze_crypt:
 add t2, a1, t1
-sb zero, 0(t2)
+sb zero, 0(t2) # aggiungo 0 in fondo alla stringa di appoggio
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -612,6 +653,7 @@ ecall
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
+la s3, myplaintext # s3 contiente l'ultimo indirizzo in cui è stato applicato un qualunque algoritmo
 loop_crypt_main:
 add t0, s2, s1
 lb t1, 0(t0) # algoritmo di cifratura attuale
@@ -627,27 +669,33 @@ beq t1,t2, alg_D_dizionario_cr
 li t2, 69 # E
 beq t1,t2, alg_E_inversione_cr
 alg_A_cesare_cr:
-la a0, myplaintext
+addi a0, s3, 0
 lw a1, sostK
 jal cesare_crypt
 j incr_crypt_main
 alg_B_blocchi_cr:
-la a0, myplaintext
+addi a0, s3, 0
 la a1, blocKey
 jal blocchi_crypt
 j incr_crypt_main
 alg_C_occorrenze_cr:
-# TODO devi capire come fare questo
+addi a0, s3, 0
+lw a1, Cypher_occorrenze
+jal occorrenze_crypt
+lw s3, Cypher_occorrenze
 j incr_crypt_main
 alg_D_dizionario_cr:
-la a0, myplaintext
+addi a0, s3, 0
 jal dizionario
 j incr_crypt_main
 alg_E_inversione_cr:
-la a0, myplaintext
+addi a0, s3, 0
 jal inversione_stringa
 incr_crypt_main:
-la a0, myplaintext
+addi a0, s3, 0
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
 li a7, 4
 ecall
 la a0, new_line # stampa '\n'
@@ -673,28 +721,34 @@ beq t1,t2, alg_D_dizionario_decr
 li t2, 69 # E
 beq t1,t2, alg_E_inversione_decr
 alg_A_cesare_decr:
-la a0, myplaintext
+addi a0, s3, 0
 lw a1, sostK
 jal cesare_decrypt
 j incr_decrypt_main
 alg_B_blocchi_decr:
-la a0, myplaintext
+addi a0, s3, 0
 la a1, blocKey
 jal blocchi_decrypt
 j incr_decrypt_main
 alg_C_occorrenze_decr:
-# TODO devi capire come fare questo
+addi a0, s3, 0
+lw a1, Cypher_occorrenze
+jal occorrenze_decrypt
+lw s3, Cypher_occorrenze
 j incr_decrypt_main
 alg_D_dizionario_decr:
-la a0, myplaintext
+addi a0, s3, 0
 jal dizionario
 j incr_decrypt_main
 alg_E_inversione_decr:
-la a0, myplaintext
+addi a0, s3, 0
 jal inversione_stringa
 incr_decrypt_main:
 # il decremento è presente in cima
-la a0, myplaintext
+addi a0, s3, 0
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
 li a7, 4
 ecall
 la a0, new_line # stampa '\n'
@@ -708,7 +762,7 @@ ecall
 la a0, new_line # stampa '\n'
 li a7, 4
 ecall
-la a0, myplaintext
+addi a0, s3, 0
 li a7, 4
 ecall
 la a0, new_line # stampa '\n'

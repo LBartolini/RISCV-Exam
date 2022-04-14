@@ -92,3 +92,25 @@ end_loop_conta_cifre:
 
 addi a0, t0, 0
 #! end
+
+# a0 ptr (dest), a1 ptr (sorg) -> (in_place)
+str_copy:
+#! a0 a1 t0 t1 t2
+#! manage_ra
+li t0, 0 # indice che scorre la stringa sorgente
+
+loop_str_copy:
+add t1, a1, t0
+lb t1, 0(t1) # t1 = sorg[t0]
+beq t1, zero, end_str_copy
+
+add t2, t0, a0
+sb t1, 0(t2)
+
+addi t0, t0, 1
+j loop_str_copy
+
+end_str_copy:
+add t2, a0, t0
+sb t1, 0(t2) # inserisco lo 0 in fondo alla stringa dest a0
+#! end

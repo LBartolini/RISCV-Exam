@@ -1,12 +1,14 @@
 .data
-Cypher_occorrenze: .word 25000
+Cypher_occorrenze: .word 40000
 app_occorrenze: .word 20000
+app_2_occorrenze: .word 30000
 .text
 # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place su cypher_text) (restituisce in a0 <- a1)
 occorrenze_crypt: 
 #! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5 t6
 #! manage_ra
 lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+lw a5, app_2_occorrenze
 
 #! precall(trova_occorrenze_caratteri)
 addi a1, a2, 0
@@ -14,7 +16,7 @@ jal trova_occorrenze_caratteri
 #! postcall(trova_occorrenze_caratteri)
 
 li t0, 32 # space
-sb t0, 0(a1)
+sb t0, 0(a5)
 
 li t1, 0 # indice for caratteri_univoci
 li t5, 1 # indice cypher_text
@@ -23,7 +25,7 @@ add t2, a2, t1
 lb a3, 0(t2) # a3 = caratteri_univoci[t1]
 beq a3, zero, end_for_esterno
 
-add t2, a1, t5
+add t2, a5, t5
 sb a3, 0(t2) # inserisco nel cypher text il carattere corrente
 addi t5, t5, 1
 
@@ -34,7 +36,7 @@ lb a4, 0(t4) # a4 = stringa_in_chiaro[t3]
 beq a4, zero, end_for_interno
 bne a4, a3, continue_for_interno
 
-add t2, a1, t5
+add t2, a5, t5
 li t0, 45 # codice ascii '-'
 sb t0, 0(t2) # inserisco -
 
@@ -62,7 +64,7 @@ sub t3, t3, t0 # sottraggo l'ultima cifra
 li t4, 10
 divu t3, t3, t4 # divido per 10
 
-add t4, a1, t5
+add t4, a5, t5
 add t4, t4, t6
 addi t0, t0, 48 # normalizzazione tabella ascii cifre
 sb t0, 0(t4)
@@ -83,7 +85,7 @@ addi t3, t3, 1
 j for_interno
 end_for_interno:
 li t0, 32 # ascii for space
-add t4, a1, t5
+add t4, a5, t5
 sb t0, 0(t4)
 addi t5, t5, 1
 
@@ -93,8 +95,14 @@ end_for_esterno:
 
 li t0, 0
 addi t5, t5, -1
-add t4, a1, t5
+add t4, a5, t5
 sb t0, 0(t4)
+
+#! precall(str_copy)
+addi a0, a1, 0
+addi a1, a5, 0
+jal str_copy
+#! postcall(str_copy)
 
 addi a0, a1, 0
 #! end
@@ -109,10 +117,12 @@ addi a0, a1, 0
 # finisce il ciclo esterno quando l'indirizzo attuale è l'indirizzo iniziale
 # a0 stringa_in_chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place su stringa_in_chiaro) (restituisce in a0 <- a0)
 occorrenze_decrypt: 
-#! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3 t4
+#! a0 a1 a2 a3 a4 a5 a6 t0 t1 t2 t3 t4 t6
 #! manage_ra
 li t4, 0 # contatore di quanti numeri ho pushato nella stack
 li a5, 1
+li t6, 0 # caratteri inseriti nella stringa_in_chiaro
+lw a6, app_occorrenze # appoggio dove inserire la stringa_in_chiaro appena decifrata
 
 #! precall(str_len)
 addi a0, a1, 0
@@ -121,7 +131,7 @@ addi a2, a0, 0
 #! postcall(str_len)
 
 add a2, a1, a2 # a2 contiene l'indirizzo dell'ultimo carattere del cypher_text
-addi a2, a2, -1 # altrimenti comincerebbe dallo 0
+addi a2, a2, -1 # (altrimenti comincerebbe dallo 0)
 addi a1, a1, 1 # così il ciclo sotto si ferma al punto giusto
 
 loop_occorrenze_decrypt:
@@ -143,8 +153,9 @@ beq t4, zero, end_inserimento_numeri_occorrenze
 lw t2, 0(sp) # pop del numero
 addi sp, sp, 4
 
-add t2, t2, a0 # t2 posizione in cui mettere il carattere a3
+add t2, t2, a6 # t2 posizione in cui mettere il carattere a3
 sb a3, 0(t2)
+addi t6, t6, 1
 
 addi t4, t4, -1
 j loop_inserimento_numeri_occorrenze
@@ -188,6 +199,11 @@ addi a2, a2, -1
 j loop_occorrenze_decrypt
 
 fine_occorrenze_decrypt:
+add t0, a6, t6
+sb zero, 0(t0) # inserisco 0 in fondo alla stringa_in_chiaro
+
+addi a1, a6, 0
+jal str_copy 
 #! end
 
 # a0 stringa, a1 appoggio -> (in place)
@@ -229,5 +245,5 @@ j loop_occorrenze_crypt
 
 end_loop_occorrenze_crypt:
 add t2, a1, t1
-sb zero, 0(t2)
+sb zero, 0(t2) # aggiungo 0 in fondo alla stringa di appoggio
 #! end

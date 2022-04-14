@@ -7,11 +7,16 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "psdcDSFSADF03249!!!f-e__--"
-mycypher: .string "AAABDEEDDAABBDEAA"
+myplaintext: .string "ABCDEFGH"
+mycypher: .string "ABDE"
+new_line: .string "\n"
 .text
 
 main:
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
@@ -65,6 +70,14 @@ la a0, myplaintext
 jal inversione_stringa
 
 incr_crypt_main:
+la a0, myplaintext
+li a7, 4
+ecall
+
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+
 addi s1, s1, 1
 j loop_crypt_main
 
@@ -125,11 +138,30 @@ jal inversione_stringa
 
 incr_decrypt_main:
 # il decremento è presente in cima
+la a0, myplaintext
+li a7, 4
+ecall
+
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+
 j loop_decrypt_main
 
 end_decrypt_main:
 
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+
 la a0, myplaintext
+li a7, 4
+ecall
+
+la a0, new_line # stampa '\n'
 li a7, 4
 ecall
 #! end

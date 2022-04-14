@@ -1,5 +1,5 @@
 .data
-sostK: .word -2
+sostK: .word 1
 .text
 # a0 stringa (ptr), a1 K -> (in place)
 cesare_crypt: 

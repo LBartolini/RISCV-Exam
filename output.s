@@ -1,9 +1,11 @@
 .data
-myplaintext: .string "psdcDSFSADF03249!!!f-e__--"
-mycypher: .string "AAABDEEDDAABBDEAA"
-sostK: .word -2
+myplaintext: .string "ABCDEFGH"
+mycypher: .string "ABDE"
+new_line: .string "\n"
+sostK: .word 1
 blocKey: .string "OLE"
-Cypher_occorrenze: .word 25000
+Cypher_occorrenze_1: .word 25000
+Cypher_occorrenze_2: .word 35000
 app_occorrenze: .word 20000
 .text
 j main
@@ -376,6 +378,7 @@ li t0, 0
 addi t5, t5, -1
 add t4, a1, t5
 sb t0, 0(t4)
+addi a0, a1, 0
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -603,6 +606,9 @@ lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
 main:
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
@@ -641,6 +647,12 @@ alg_E_inversione_cr:
 la a0, myplaintext
 jal inversione_stringa
 incr_crypt_main:
+la a0, myplaintext
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
 addi s1, s1, 1
 j loop_crypt_main
 ########################
@@ -682,8 +694,23 @@ la a0, myplaintext
 jal inversione_stringa
 incr_decrypt_main:
 # il decremento è presente in cima
+la a0, myplaintext
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
 j loop_decrypt_main
 end_decrypt_main:
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
+li a7, 4
+ecall
 la a0, myplaintext
+li a7, 4
+ecall
+la a0, new_line # stampa '\n'
 li a7, 4
 ecall

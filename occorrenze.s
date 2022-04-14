@@ -2,7 +2,7 @@
 Cypher_occorrenze: .word 25000
 app_occorrenze: .word 20000
 .text
-# a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place su cypher_text)
+# a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place su cypher_text) (restituisce in a0 <- a1)
 occorrenze_crypt: 
 #! a0 a1 a2 a3 a4 t0 t1 t2 t3 t4 t5 t6
 #! manage_ra
@@ -95,6 +95,8 @@ li t0, 0
 addi t5, t5, -1
 add t4, a1, t5
 sb t0, 0(t4)
+
+addi a0, a1, 0
 #! end
 
 
@@ -105,7 +107,7 @@ sb t0, 0(t4)
 # prosegue fino a quando il carattere successivo è uno spazio, in tal caso il carattere attuale è il carattere da posizionare nella stringa in chiaro
 # si esegue un for per le volte del contatore, ogni volta si fa il pop dalla stack e si mette il carattere nella posizione a0[pop()]
 # finisce il ciclo esterno quando l'indirizzo attuale è l'indirizzo iniziale
-# a0 stringa_in_chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place su stringa_in_chiaro)
+# a0 stringa_in_chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place su stringa_in_chiaro) (restituisce in a0 <- a0)
 occorrenze_decrypt: 
 #! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3 t4
 #! manage_ra

@@ -7,8 +7,8 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "pippoplutopaperino"
-mycypher: .string "ABDE"
+myplaintext: .string "psdcDSFSADF03249!!!f-e__--"
+mycypher: .string "AAABDEEDDAABBDEAA"
 .text
 
 main:
@@ -76,7 +76,7 @@ j loop_crypt_main
 loop_decrypt_main:
 addi s1, s1, -1
 
-beq s1, zero, end_decrypt_main 
+blt s1, zero, end_decrypt_main 
 add t0, s2, s1
 lb t1, 0(t0) # algoritmo di decifratura attuale
 

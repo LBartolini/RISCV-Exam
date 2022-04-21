@@ -1,6 +1,6 @@
 .data
-myplaintext: .string "pippoFromIbiza"
-mycypher: .string "ADB"
+myplaintext: .string "pippoFro345--!!mIbiza"
+mycypher: .string "ABC"
 new_line: .string "\n"
 sostK: .word 1
 blocKey: .string "OLE"
@@ -105,6 +105,21 @@ j loop_str_copy
 end_str_copy:
 add t2, a0, t0
 sb t1, 0(t2) # inserisco lo 0 in fondo alla stringa dest a0
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra
+stampa_new_line:
+addi sp, sp, -4
+sw ra, 0(sp)
+addi sp, sp, -8
+sw a0, 4(sp)
+sw a7, 0(sp)
+la a0, new_line
+li a7, 4
+ecall
+lw a7, 0(sp)
+lw a0, 4(sp)
+addi sp, sp, 8
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -647,9 +662,7 @@ lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
 main:
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
@@ -695,12 +708,8 @@ incr_crypt_main:
 addi a0, s3, 0
 li a7, 4
 ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 addi s1, s1, 1
 j loop_crypt_main
 ########################
@@ -748,23 +757,14 @@ incr_decrypt_main:
 addi a0, s3, 0
 li a7, 4
 ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 j loop_decrypt_main
 end_decrypt_main:
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 addi a0, s3, 0
 li a7, 4
 ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line

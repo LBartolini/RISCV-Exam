@@ -1,3 +1,5 @@
+.data
+new_line: .string "\n"
 .text
 # a0 x, a1 n -> a0 (x%n)
 modulo:
@@ -113,4 +115,20 @@ j loop_str_copy
 end_str_copy:
 add t2, a0, t0
 sb t1, 0(t2) # inserisco lo 0 in fondo alla stringa dest a0
+#! end
+
+stampa_new_line:
+#! 
+#! manage_ra
+addi sp, sp, -8
+sw a0, 4(sp)
+sw a7, 0(sp)
+
+la a0, new_line
+li a7, 4
+ecall
+
+lw a7, 0(sp)
+lw a0, 4(sp)
+addi sp, sp, 8
 #! end

@@ -7,16 +7,12 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "pippoFromIbiza"
-mycypher: .string "ADB"
-new_line: .string "\n"
+myplaintext: .string "pippoFro345--!!mIbiza"
+mycypher: .string "ABC"
 .text
 
 main:
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-
+jal stampa_new_line
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
@@ -80,12 +76,8 @@ addi a0, s3, 0
 li a7, 4
 ecall
 
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 
 addi s1, s1, 1
 j loop_crypt_main
@@ -156,29 +148,20 @@ addi a0, s3, 0
 li a7, 4
 ecall
 
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 
 j loop_decrypt_main
 
 end_decrypt_main:
 
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 
 addi a0, s3, 0
 li a7, 4
 ecall
 
-la a0, new_line # stampa '\n'
-li a7, 4
-ecall
+jal stampa_new_line
+jal stampa_new_line
 #! end

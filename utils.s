@@ -132,3 +132,20 @@ lw a7, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
 #! end
+
+# pone a 0 tutte le celle della stringa
+# a0 stringa -> (in_place)
+delete_string:
+#! a0 t0 t1
+#! manage_ra
+li t0, 0
+loop_delete_string:
+add t1, a0, t0
+lb t1, 0(t1)
+beq t1, zero, end_delete_string
+add t1, a0, t0
+sb zero, 0(t1)
+addi t0, t0, 1
+j loop_delete_string
+end_delete_string:
+#! end

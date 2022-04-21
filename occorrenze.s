@@ -1,7 +1,7 @@
 .data
-Cypher_occorrenze: .word 40000
-app_occorrenze: .word 20000
-app_2_occorrenze: .word 30000
+Cypher_occorrenze: .word 800000
+app_occorrenze: .word 200000
+app_2_occorrenze: .word 500000
 .text
 # a0 stringa in chiaro (source) (ptr), a1 cyper_text (dest) (ptr) -> (in_place su cypher_text) (restituisce in a0 <- a1)
 occorrenze_crypt: 
@@ -60,7 +60,7 @@ jal modulo
 addi t0, a0, 0 # t0 = ultima cifra
 #! postcall(modulo)
 
-sub t3, t3, t0 # sottraggo l'ultima cifra
+sub t3, t3, t0 # sottraggo l'ultima cifra (probabilmente inutile)
 li t4, 10
 divu t3, t3, t4 # divido per 10
 
@@ -103,6 +103,11 @@ addi a0, a1, 0
 addi a1, a5, 0
 jal str_copy
 #! postcall(str_copy)
+
+#! precall(delete_string)
+addi a0, a2, 0
+jal delete_string
+#! postcall(delete_string)
 
 addi a0, a1, 0
 #! end

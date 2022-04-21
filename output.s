@@ -1,12 +1,12 @@
 .data
-myplaintext: .string "pippoFro345--!!mIbiza"
-mycypher: .string "ABC"
+myplaintext: .string "pippoFrbto345--!!mIbiza"
+mycypher: .string "ADCBEECBADDCD"
 new_line: .string "\n"
 sostK: .word 1
 blocKey: .string "OLE"
-Cypher_occorrenze: .word 40000
-app_occorrenze: .word 20000
-app_2_occorrenze: .word 30000
+Cypher_occorrenze: .word 800000
+app_occorrenze: .word 200000
+app_2_occorrenze: .word 500000
 .text
 j main
 modulo:
@@ -120,6 +120,22 @@ ecall
 lw a7, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
+lw ra, 0(sp)
+addi sp, sp, 4
+jr ra
+delete_string:
+addi sp, sp, -4
+sw ra, 0(sp)
+li t0, 0
+loop_delete_string:
+add t1, a0, t0
+lb t1, 0(t1)
+beq t1, zero, end_delete_string
+add t1, a0, t0
+sb zero, 0(t1)
+addi t0, t0, 1
+j loop_delete_string
+end_delete_string:
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -382,7 +398,7 @@ addi t0, a0, 0 # t0 = ultima cifra
 lw a1, 0(sp)
 lw a0, 4(sp)
 addi sp, sp, 8
-sub t3, t3, t0 # sottraggo l'ultima cifra
+sub t3, t3, t0 # sottraggo l'ultima cifra (probabilmente inutile)
 li t4, 10
 divu t3, t3, t4 # divido per 10
 add t4, a5, t5
@@ -427,6 +443,16 @@ lw t0, 8(sp)
 lw a1, 12(sp)
 lw a0, 16(sp)
 addi sp, sp, 20
+addi sp, sp, -12
+sw a0, 8(sp)
+sw t0, 4(sp)
+sw t1, 0(sp)
+addi a0, a2, 0
+jal delete_string
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a0, 8(sp)
+addi sp, sp, 12
 addi a0, a1, 0
 lw ra, 0(sp)
 addi sp, sp, 4

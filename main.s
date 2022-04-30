@@ -9,14 +9,18 @@
 .data
 myplaintext: .string "poadsf4350$$--..dsfsksDSFSDFsdsf"
 mycypher: .string "ABCDEABCDE"
+working_place: .word 800000
 .text
 
 main:
+lw a0, working_place
+la a1, myplaintext
+jal str_copy # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro per gli algoritmi senza influenzare la memoria circostante (durante l'algoritmo occorrenze)
+
 jal stampa_new_line
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
-la s3, myplaintext # s3 contiente l'ultimo indirizzo in cui è stato applicato un qualunque algoritmo
 
 loop_crypt_main:
 add t0, s2, s1
@@ -35,7 +39,6 @@ li t2, 69 # E
 beq t1,t2, alg_E_inversione_cr
 
 alg_A_cesare_cr:
-addi a0, s3, 0
 lw a1, sostK
 
 jal cesare_crypt
@@ -43,7 +46,6 @@ jal cesare_crypt
 j incr_crypt_main
 
 alg_B_blocchi_cr:
-addi a0, s3, 0
 la a1, blocKey
 
 jal blocchi_crypt
@@ -51,28 +53,23 @@ jal blocchi_crypt
 j incr_crypt_main
 
 alg_C_occorrenze_cr:
-addi a0, s3, 0
-lw a1, Cypher_occorrenze
+addi a1, a0, 0
 
 jal occorrenze_crypt
-lw s3, Cypher_occorrenze
 
 j incr_crypt_main
 
 alg_D_dizionario_cr:
-addi a0, s3, 0
 
 jal dizionario
 
 j incr_crypt_main
 
 alg_E_inversione_cr:
-addi a0, s3, 0
 
 jal inversione_stringa
 
 incr_crypt_main:
-addi a0, s3, 0
 li a7, 4
 ecall
 
@@ -106,7 +103,6 @@ li t2, 69 # E
 beq t1,t2, alg_E_inversione_decr
 
 alg_A_cesare_decr:
-addi a0, s3, 0
 lw a1, sostK
 
 jal cesare_decrypt
@@ -114,7 +110,6 @@ jal cesare_decrypt
 j incr_decrypt_main
 
 alg_B_blocchi_decr:
-addi a0, s3, 0
 la a1, blocKey
 
 jal blocchi_decrypt
@@ -122,29 +117,24 @@ jal blocchi_decrypt
 j incr_decrypt_main
 
 alg_C_occorrenze_decr:
-addi a0, s3, 0
-lw a1, Cypher_occorrenze
+addi a1, a0, 0
 
 jal occorrenze_decrypt
-lw s3, Cypher_occorrenze
 
 j incr_decrypt_main
 
 alg_D_dizionario_decr:
-addi a0, s3, 0
 
 jal dizionario
 
 j incr_decrypt_main
 
 alg_E_inversione_decr:
-addi a0, s3, 0
 
 jal inversione_stringa
 
 incr_decrypt_main:
 # il decremento è presente in cima
-addi a0, s3, 0
 li a7, 4
 ecall
 
@@ -158,7 +148,12 @@ end_decrypt_main:
 jal stampa_new_line
 jal stampa_new_line
 
-addi a0, s3, 0
+li a7, 4
+ecall
+
+jal stampa_new_line
+
+la a0, myplaintext
 li a7, 4
 ecall
 

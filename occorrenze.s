@@ -1,5 +1,4 @@
 .data
-Cypher_occorrenze: .word 800000
 app_occorrenze: .word 200000
 app_2_occorrenze: .word 500000
 .text
@@ -126,6 +125,7 @@ occorrenze_decrypt:
 #! manage_ra
 li t4, 0 # contatore di quanti numeri ho pushato nella stack
 li a5, 1
+li a4, 0
 li t6, 0 # caratteri inseriti nella stringa_in_chiaro
 lw a6, app_occorrenze # appoggio dove inserire la stringa_in_chiaro appena decifrata
 

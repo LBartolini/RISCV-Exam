@@ -9,6 +9,7 @@ inversione_stringa:
 jal str_len
 addi a1, a0, 0
 #! postcall(str_len)
+
 srli a2, a1, 1 # divido per due per sapere quando fermarmi
 li t0, 0 # indice per scorrere la stringa
 

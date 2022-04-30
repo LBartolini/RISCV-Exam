@@ -7,8 +7,8 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "pippoFrbto345--!!mIbiza"
-mycypher: .string "ADCBEECBADDCD"
+myplaintext: .string "poadsf4350$$--..dsfsksDSFSDFsdsf"
+mycypher: .string "ABCDEABCDE"
 .text
 
 main:

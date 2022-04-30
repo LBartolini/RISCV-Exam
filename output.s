@@ -1,6 +1,6 @@
 .data
-myplaintext: .string "pippoFrbto345--!!mIbiza"
-mycypher: .string "ADCBEECBADDCD"
+myplaintext: .string "poadsf4350$$--..dsfsksDSFSDFsdsf"
+mycypher: .string "ABCDEABCDE"
 new_line: .string "\n"
 sostK: .word 1
 blocKey: .string "OLE"
@@ -13,13 +13,11 @@ modulo:
 addi sp, sp, -4
 sw ra, 0(sp)
 loop_modulo_1:
-bge a0, zero, loop_modulo_2
+bge a0, zero, continue_modulo
 add a0, a0, a1
 j loop_modulo_1
-loop_modulo_2:
-blt a0, a1, end_modulo
-sub a0, a0, a1
-j loop_modulo_2
+continue_modulo:
+rem a0, a0, a1 # resto divisione x/n
 end_modulo:
 lw ra, 0(sp)
 addi sp, sp, 4

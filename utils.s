@@ -7,14 +7,12 @@ modulo:
 #! manage_ra 
 
 loop_modulo_1:
-bge a0, zero, loop_modulo_2
+bge a0, zero, continue_modulo
 add a0, a0, a1
 j loop_modulo_1
 
-loop_modulo_2:
-blt a0, a1, end_modulo
-sub a0, a0, a1
-j loop_modulo_2
+continue_modulo:
+rem a0, a0, a1 # resto divisione x/n
 
 end_modulo:
 #! end

@@ -13,3 +13,7 @@ Cycles: 32610
 - After rem implementation of modulo
 
 Cycles: 31428
+
+- Mul instead of my mult procedure
+
+Cycles: 27388

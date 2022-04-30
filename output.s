@@ -1,7 +1,16 @@
 .data
-myplaintext: .string "poadsf4350$$--..dsfsksDSFSDFsdsf"
+myplaintext: .string "a$$--..dsfsksDSFSDFsdsf"
 mycypher: .string "ABCDEABCDE"
 working_place: .word 800000
+_originale: .string "Originale: "
+_decifrato: .string "Decifrato: "
+_cifrato_usando: .string "Cifrato usando: "
+_decifrato_usando: .string "Decifrato usando: "
+_alg_a_cesare: .string "Algoritmo di Cesare (A)"
+_alg_b_blocchi: .string "Algoritmo a Blocchi (B)"
+_alg_c_occorrenze: .string "Algoritmo a Occorrenze (C)"
+_alg_d_dizionario: .string "Algoritmo a Dizionario (D)"
+_alg_e_inversione: .string "Algoritmo a Inversione (E)"
 new_line: .string "\n"
 sostK: .word 1
 blocKey: .string "OLE"
@@ -53,21 +62,6 @@ found_char:
 li t2, 1
 end_loop_check_char:
 addi a0, t2, 0
-lw ra, 0(sp)
-addi sp, sp, 4
-jr ra
-mult:
-addi sp, sp, -4
-sw ra, 0(sp)
-li t0, 0
-li t1, 0
-loop_mult:
-bge t0, a1, fine_loop_mult
-add t1, t1, a0
-addi t0, t0, 1
-j loop_mult
-fine_loop_mult:
-add a0, t1, zero
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -506,35 +500,10 @@ j incr_loop_occorrenze_decrypt
 pass_occorrenze_decrypt:
 beq a3, t2, push_numero_stack_occorrenze # se trovo un '-' devo pushare il numero (a4) nella stack
 addi a3, a3, -48 # riconverto la cifra in ascii a decimale
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-addi a0, a3, 0 # cifra
-addi a1, a5, 0 # 1/10/100/...
-jal mult
-addi t2, a0, 0
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+mul t2, a3, a5
 add a4, a4, t2 # incremento la somma parziale
-addi sp, sp, -16
-sw a0, 12(sp)
-sw a1, 8(sp)
-sw t0, 4(sp)
-sw t1, 0(sp)
-li a0, 10
-addi a1, a5, 0 # 1/10/100/...
-jal mult # moltiplico per 10 il fattore parziale che moltiplica le cifre
-addi a5, a0, 0
-lw t1, 0(sp)
-lw t0, 4(sp)
-lw a1, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+li a7, 10
+mul a5, a5, a7
 j incr_loop_occorrenze_decrypt
 push_numero_stack_occorrenze:
 addi sp, sp, -4
@@ -690,7 +659,6 @@ main:
 lw a0, working_place
 la a1, myplaintext
 jal str_copy # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro per gli algoritmi senza influenzare la memoria circostante (durante l'algoritmo occorrenze)
-jal stampa_new_line
 li s0, 0 # contatore degli algoritmi di cifratura applicati
 li s1, 0 # indice per scorrere mycypher
 la s2, mycypher
@@ -698,6 +666,9 @@ loop_crypt_main:
 add t0, s2, s1
 lb t1, 0(t0) # algoritmo di cifratura attuale
 beq t1, zero, loop_decrypt_main 
+li a7, 4
+la a0, _cifrato_usando
+ecall
 li t2, 65 # A
 beq t1,t2, alg_A_cesare_cr
 li t2, 66 # B
@@ -709,23 +680,44 @@ beq t1,t2, alg_D_dizionario_cr
 li t2, 69 # E
 beq t1,t2, alg_E_inversione_cr
 alg_A_cesare_cr:
+la a0, _alg_a_cesare
+ecall
+jal stampa_new_line
+lw a0, working_place
 lw a1, sostK
 jal cesare_crypt
 j incr_crypt_main
 alg_B_blocchi_cr:
+la a0, _alg_b_blocchi
+ecall
+jal stampa_new_line
+lw a0, working_place
 la a1, blocKey
 jal blocchi_crypt
 j incr_crypt_main
 alg_C_occorrenze_cr:
+la a0, _alg_c_occorrenze
+ecall
+jal stampa_new_line
+lw a0, working_place
 addi a1, a0, 0
 jal occorrenze_crypt
 j incr_crypt_main
 alg_D_dizionario_cr:
+la a0, _alg_d_dizionario
+ecall
+jal stampa_new_line
+lw a0, working_place
 jal dizionario
 j incr_crypt_main
 alg_E_inversione_cr:
+la a0, _alg_e_inversione
+ecall
+jal stampa_new_line
+lw a0, working_place
 jal inversione_stringa
 incr_crypt_main:
+# Stampa risultato parziale
 li a7, 4
 ecall
 jal stampa_new_line
@@ -739,6 +731,9 @@ addi s1, s1, -1
 blt s1, zero, end_decrypt_main 
 add t0, s2, s1
 lb t1, 0(t0) # algoritmo di decifratura attuale
+la a0, _decifrato_usando
+li a7, 4
+ecall
 li t2, 65 # A
 beq t1,t2, alg_A_cesare_decr
 li t2, 66 # B
@@ -750,21 +745,41 @@ beq t1,t2, alg_D_dizionario_decr
 li t2, 69 # E
 beq t1,t2, alg_E_inversione_decr
 alg_A_cesare_decr:
+la a0, _alg_a_cesare
+ecall
+jal stampa_new_line
+lw a0, working_place
 lw a1, sostK
 jal cesare_decrypt
 j incr_decrypt_main
 alg_B_blocchi_decr:
+la a0, _alg_b_blocchi
+ecall
+jal stampa_new_line
+lw a0, working_place
 la a1, blocKey
 jal blocchi_decrypt
 j incr_decrypt_main
 alg_C_occorrenze_decr:
+la a0, _alg_c_occorrenze
+ecall
+jal stampa_new_line
+lw a0, working_place
 addi a1, a0, 0
 jal occorrenze_decrypt
 j incr_decrypt_main
 alg_D_dizionario_decr:
+la a0, _alg_d_dizionario
+ecall
+jal stampa_new_line
+lw a0, working_place
 jal dizionario
 j incr_decrypt_main
 alg_E_inversione_decr:
+la a0, _alg_e_inversione
+ecall
+jal stampa_new_line
+lw a0, working_place
 jal inversione_stringa
 incr_decrypt_main:
 # il decremento è presente in cima
@@ -777,10 +792,15 @@ end_decrypt_main:
 jal stampa_new_line
 jal stampa_new_line
 li a7, 4
+addi t0, a0, 0
+la a0, _decifrato
+ecall
+addi a0, t0, 0
 ecall
 jal stampa_new_line
-la a0, myplaintext
+la a0, _originale
 li a7, 4
 ecall
-jal stampa_new_line
+la a0, myplaintext
+ecall
 jal stampa_new_line

@@ -56,22 +56,6 @@ end_loop_check_char:
 addi a0, t2, 0
 #! end
 
-# a0 x, a1 y -> a0 (x*y)
-mult: 
-#! a0 a1 t0 t1
-#! manage_ra
-li t0, 0
-li t1, 0
-loop_mult:
-bge t0, a1, fine_loop_mult
-add t1, t1, a0
-addi t0, t0, 1
-j loop_mult
-
-fine_loop_mult:
-add a0, t1, zero
-#! end
-
 # a0 numero -> a0 k cifre
 conta_cifre: 
 #! a0 a1 t0 t1 t2

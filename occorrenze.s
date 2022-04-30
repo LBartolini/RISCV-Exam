@@ -121,7 +121,7 @@ addi a0, a1, 0
 # finisce il ciclo esterno quando l'indirizzo attuale è l'indirizzo iniziale
 # a0 stringa_in_chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place su stringa_in_chiaro) (restituisce in a0 <- a0)
 occorrenze_decrypt: 
-#! a0 a1 a2 a3 a4 a5 a6 t0 t1 t2 t3 t4 t6
+#! a0 a1 a2 a3 a4 a5 a6 t0 t1 t2 t3 t4 t6 t7
 #! manage_ra
 li t4, 0 # contatore di quanti numeri ho pushato nella stack
 li a5, 1
@@ -174,21 +174,12 @@ beq a3, t2, push_numero_stack_occorrenze # se trovo un '-' devo pushare il numer
 
 addi a3, a3, -48 # riconverto la cifra in ascii a decimale
 
-#! precall(mult)
-addi a0, a3, 0 # cifra
-addi a1, a5, 0 # 1/10/100/...
-jal mult
-addi t2, a0, 0
-#! postcall(mult)
+mul t2, a3, a5
 
 add a4, a4, t2 # incremento la somma parziale
 
-#! precall(mult)
-li a0, 10
-addi a1, a5, 0 # 1/10/100/...
-jal mult # moltiplico per 10 il fattore parziale che moltiplica le cifre
-addi a5, a0, 0
-#! postcall(mult)
+li a7, 10
+mul a5, a5, a7
 
 j incr_loop_occorrenze_decrypt
 

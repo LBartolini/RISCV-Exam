@@ -1,6 +1,6 @@
 .data
-myplaintext: .string "a$$--..dsfsksDSFSDFsdsf"
-mycypher: .string "ABCDEABCDE"
+myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
+mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "
 _decifrato: .string "Decifrato: "

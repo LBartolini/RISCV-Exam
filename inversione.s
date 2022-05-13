@@ -7,6 +7,9 @@ inversione_stringa:
 
 # scorro la stringa con i fino ad n/2 (con n lunghezza della stringa)
 # ed eseguo una swap dei caratteri in posizione i e n-i
+# osservare come non sia necessario separare la procedura in due fasi (cifratura e decifratura)
+# in quanto la funzione di inversione sia essa stessa la sua funzione inversa
+# ovvero riapplicando la stessa procedura si riottiene la stringa di partenza
 
 # calcolo la lunghezza della stringa in a1
 #! precall(str_len)

@@ -1,10 +1,11 @@
 .data
 sostK: .word 1
 .text
-# a0 stringa (ptr), a1 K -> (in place)
+
 cesare_crypt: 
 #! a0 a1 a2 a3 a4 t0 t1
 #! manage_ra
+# a0 stringa (ptr), a1 K -> (in place)
 
 # scorro la  stringa (a0) e controllo ogni carattere
 # se è una lettera minuscola o maiuscola applico l'algoritmo
@@ -57,10 +58,11 @@ j loop_cesare_crypt
 end_loop_cesare_crypt:
 #! end
 
-# a0 stringa (ptr), a1 K -> (in place)
+
 cesare_decrypt: 
 #! a0 a1 a2 a3 a4 t0 t1
 #! manage_ra
+# a0 stringa (ptr), a1 K -> (in place)
 
 # scorro la stringa a0 e, come per la cifratura, controllo il carattere corrente 
 # confrontandolo con i range di lettere minuscole e maiuscole

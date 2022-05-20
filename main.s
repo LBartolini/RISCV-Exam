@@ -7,7 +7,7 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
+myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf" # IPOTESI -> la stringa contiene almeno due caratteri 
 mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "

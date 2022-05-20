@@ -1,9 +1,9 @@
 .text
 
-# a0 stringa (ptr) -> (in place)
 inversione_stringa:
 #! a0 a1 a2 a3, a4 t0
 #! manage_ra
+# a0 stringa (ptr) -> (in place)
 
 # scorro la stringa con i fino ad n/2 (con n lunghezza della stringa)
 # ed eseguo una swap dei caratteri in posizione i e n-i
@@ -21,7 +21,7 @@ srli a2, a1, 1 # divido per due per sapere quando fermarmi
 li t0, 0 # indice per scorrere la stringa
 
 # nb: dividendo per due con srli eseguo un troncamento in caso di lunghezza dispari
-# questo però non mi interessa perchè in caso di lunghezza dispari il carattere centrale
+# questo però non mi interessa perchè in quel caso il carattere centrale
 # rimarrà nella stessa posizione
 
 loop_inversione_stringa:

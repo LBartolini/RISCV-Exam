@@ -1,10 +1,11 @@
 .data
 blocKey: .string "OLE"
 .text
-# a0 stringa (ptr), a1 key (ptr) -> (in place)
+
 blocchi_crypt: 
 #! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3
 #! manage_ra
+# a0 stringa (ptr), a1 key (ptr) -> (in place)
 
 # scorro la stringa a0 e ci sommo 
 # (in modulo 96) il codice del carattere corrispondente nel blocco
@@ -50,10 +51,10 @@ j loop_blocchi_crypt
 end_loop_blocchi_crypt:
 #! end
 
-# a0 stringa (ptr), a1 key (ptr) -> (in place)
 blocchi_decrypt: 
 #! a0 a1 a2 a3 a4 a5 t0 t1 t2 t3
 #! manage_ra
+# a0 stringa (ptr), a1 key (ptr) -> (in place)
 
 # scorro la stringa a0 e, come per la cifratura, scorro in modulo la blocco
 # e sottraggo il valore in modulo 96

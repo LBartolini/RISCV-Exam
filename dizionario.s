@@ -1,9 +1,9 @@
 .text
 
-# a0 (stringa) -> (in place)
 dizionario:
 #! a0
 #! manage_ra
+# a0 (stringa) -> (in place)
 
 # scorro la stringa a0 e per ogni carattere controllo a che categoria appartiene
 # per ogni categoria (lett. minuscola, lett. maiuscola, cifra) eseguo l'operazione associata

@@ -1,5 +1,5 @@
 .data
-myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf" # IPOTESI -> la stringa contiene almeno due caratteri
+myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
 mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "
@@ -17,8 +17,7 @@ blocKey: .string "OLE"
 app_occorrenze: .word 200000
 app_2_occorrenze: .word 500000
 .text
-j main # salta alla procedura main (entry point) che si trova in fondo al file
-
+j main
 modulo:
 addi sp, sp, -4
 sw ra, 0(sp)
@@ -149,10 +148,12 @@ addi sp, sp, 4
 jr ra
 
 stampa_new_line:
+addi sp, sp, -4
+sw ra, 0(sp)
+
 # procedura che stampa semplicemente un carattere new_line
 
-addi sp, sp, -12
-sw ra, 8(sp)
+addi sp, sp, -8
 sw a0, 4(sp)
 sw a7, 0(sp)
 
@@ -162,8 +163,9 @@ ecall
 
 lw a7, 0(sp)
 lw a0, 4(sp)
-lw ra, 8(sp)
-addi sp, sp, 12
+addi sp, sp, 8
+lw ra, 0(sp)
+addi sp, sp, 4
 jr ra
 
 delete_string:
@@ -485,13 +487,8 @@ lw a1, 20(sp)
 lw a0, 24(sp)
 addi sp, sp, 28
 
-# inserisco come primo carattere uno spazio
-# questo mi servirà per semplificare il codice per la fase di decifrazione
-li t0, 32 # space
-sb t0, 0(a5)
-
 li t1, 0 # indice for caratteri_univoci
-li t5, 1 # indice cypher_text (destinazione)
+li t5, 0 # indice cypher_text (destinazione)
 for_esterno: # scorre i caratteri univoci
 add t2, a2, t1
 lb a3, 0(t2) # a3 = caratteri_univoci[t1]
@@ -638,110 +635,68 @@ jr ra
 occorrenze_decrypt:
 addi sp, sp, -4
 sw ra, 0(sp)
-# a0 stringa_in_chiaro (dest) (ptr), a1 cyper_text (source) (ptr) -> (in_place su stringa_in_chiaro) (restituisce in a0 <- a0)
+# a0 stringa_in_chiaro (dest) (ptr), a1 cypher_text (source) (ptr) -> (in_place su stringa_in_chiaro) (restituisce in a0 <- a0)
 
-# scorrere il cypher text dalla fine verso l'inizio
-# quando si trova un numero lo si mette da parte e si moltiplica per 1 (la prima volta)
-# poi si moltiplica l'1 per 10 e il successivo numero lo si moltiplica per 10 e si somma al precedente
-# continuare così finchè non si trova un -, in tal caso si effettua il push sulla stack del numero completo e si 
-# incrementa un contatore che terrà traccia di quanti numeri ho inserito nella stack
-# si prosegue fino a quando il carattere successivo è uno spazio, in tal caso il carattere 
-# attuale è il carattere da posizionare nella stringa in chiaro
-# si esegue un ciclo per quanti numeri sono nella stack, ogni volta si fa il pop e si inserisce il carattere nella posizione a0[pop()]
-# finisce il ciclo esterno quando l'indirizzo attuale è l'indirizzo iniziale
+# scorro la stringa partendo dalla posizione 2 (preventivamente salvo il primo carattere)
+# ogni volta che incontro una cifra la aggiungo alla somma parziale e quando trovo un '-', uno spazio o la fine della stringa
+# salvo nella destinazione il carattere attuale
+# se avevo trovato un '-' proseguo con il numero successivo
+# se avevo trovato uno spazio modifico il carattere attuale e proseguo
+# se infine avevo terminato la stringa finisco la procedura
 
-li t4, 0 # contatore di quanti numeri ho inserito nella stack
-li a5, 1 # moltiplicatore della posizione della cifra (1, 10, 100, ...)
-li a4, 0 # appoggio temporaneo in cui calcolo la somma delle singole cifre che incontro
-li t6, 0 # caratteri inseriti nella stringa_in_chiaro
-lw a6, app_occorrenze # appoggio dove lavorare durante il decrypt, alla fine verrà copiato in a0
+li a2, 2 # indice che scorre la stringa da decifrare (inizializzato a 2 perchè in posizione 0 e 1 ci sono rispettivamente il carattere e '-')
+li a3, 0 # somma parziale
+lw a4, app_occorrenze # appoggio dove lavorare durante il decrypt, alla fine verrà copiato in a0
+lb a5, 0(a1) # a5 indica il carattere da scrivere attuale (inizializzato al primo carattere della stringa da decifrare)
+li t4, 0 # contatore dei caratteri inseriti a destinazione
 
-# calcolo la lunghezza della stringa a1 così da poter scorrerla dalla fine all'inizio
-addi sp, sp, -16
-sw a0, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
-addi a0, a1, 0
-jal str_len
-addi a2, a0, 0
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
-
-add a2, a1, a2 # a2 contiene l'indirizzo dell'ultimo carattere del cypher_text
-addi a2, a2, -1 # (altrimenti comincerebbe dallo 0 in fondo alla stringa)
-addi a1, a1, 1 # incremento l'indirizzo del cypher_text così il ciclo si ferma al punto giusto
-
-# per capire quando terminare il ciclo e soprattutto per capire quando termina la serie di posizioni relative ad un carattere
-# vengono usati tre caratteri adiacenti contemporaneamente
 loop_occorrenze_decrypt:
-blt a2, a1, fine_occorrenze_decrypt # ciclo finchè la posizione a sinistra fa parte della stringa
-lb a3, 0(a2) # a3 carattere corrente
-lb t0, 1(a2) # carattere a destra
-lb t1, -1(a2) # carattere a sinistra
+add t0, a1, a2
+lb t1, 0(t0) # t1 = cypher_text[a2] ovvero il carattere corrente
 
 li t2, 45 # ascii '-'
 li t3, 32 # ascii 'space'
-# se il carattere a sinistra non è uno spazio o quello a destra non è un '-' allora continuo all'interno del ciclo
-bne t1, t3, pass_occorrenze_decrypt
-bne t0, t2, pass_occorrenze_decrypt
+# se il carattere corrente è un '-' oppure ' ' (spazio) allora inserisco nella stringa in chiaro il carattere corrente 
+# e, nel caso dello spazio, passo al carattere successivo
+beq t1, t2, scrivi_carattere_occorrenze
+beq t1, t3, scrivi_carattere_occorrenze
+beq t1, zero, scrivi_carattere_occorrenze 
 
-# se entro qui significa che ho trovato un carattere all'interno del cypher_text
-# e devo inserirlo nella stringa in chiaro
-# per farlo faccio un ciclo che parte da t4(contatore dei numeri nella stack) e finisce a zero
-loop_inserimento_numeri_occorrenze:
-beq t4, zero, end_inserimento_numeri_occorrenze
+# se arrivo qui significa che ho trovato un numero e devo sommarlo alla somma parziale
+li t2, 10
+mul a3, a3, t2 # moltiplico per 10 la somma parziale e successivamente sommo il numero appena trovato
 
-lw t2, 0(sp) # pop del numero
-addi sp, sp, 4
-
-add t2, t2, a6 # t2 posizione in cui mettere il carattere a3
-sb a3, 0(t2)
-addi t6, t6, 1 # incremento l'indice che scorre la stringa di destinazione
-
-addi t4, t4, -1
-j loop_inserimento_numeri_occorrenze
-
-end_inserimento_numeri_occorrenze:
-addi a2, a2, -1 # scorro un carattere in più per saltare lo spazio nel mezzo alle codifiche
-j incr_loop_occorrenze_decrypt
-
-pass_occorrenze_decrypt:
-# se il carattere corrente è un '-' (t2) devo pushare il numero (a4) nella stack
-# altrimenti significa che è una cifra e devo moltiplicarla e sommarla alla somma parziale
-beq a3, t2, push_numero_stack_occorrenze 
-
-addi a3, a3, -48 # riconverto la cifra da ascii a decimale
-
-mul t2, a3, a5 # moltiplico per la sua posizione all'interno del numero finale
-
-add a4, a4, t2 # aggiungo alla somma parziale
-
-li a7, 10
-mul a5, a5, a7
+addi t1, t1, -48 # normalizzazione ascii
+add a3, a3, t1
 
 j incr_loop_occorrenze_decrypt
 
-push_numero_stack_occorrenze:
-addi sp, sp, -4
-sw a4, 0(sp)
-addi t4, t4, 1 # incremento il contatore dei numeri nella stack
-li a5, 1 # resetto a5 (valore con cui moltiplico la cifra attuale dei numeri)
-li a4, 0 # resetto a4 (somma parziale del numero)
+scrivi_carattere_occorrenze:
+# se il carattere corrente è un '-' (t2) scrivo semplicemente nella stringa in chiaro
+# altrimenti significa che è uno spazio quindi devo scrivere il numero nella stringa in chiaro e aggiornare il valore del carattere corrente
+
+add t0, a4, a3
+sb a5, 0(t0) # a4[a3] = a5, scrivo nella posizione corretta il carattere da scrivere attuale 
+li a3, 0 # reset della somma parziale
+addi t4, t4, 1
+
+beq t1, t2, incr_loop_occorrenze_decrypt # se sono arrivato qui per un '-' allora passo all'incremento
+beq t1, zero, fine_occorrenze_decrypt # se sono arrivato qui perchè era l'ultimo carattere della stringa allora finisco l'algoritmo
+# altrimenti aggiorno il carattere attuale e incremento a mano
+add t0, a1, a2
+lb a5, 1(t0) # carattere successivo allo spazio
+addi a2, a2, 2 # incrementanto di 2 adesso (e successivamente di 1) punterà al primo numero del carattere attuale successivo
 
 incr_loop_occorrenze_decrypt:
-addi a2, a2, -1
+addi a2, a2, 1
 j loop_occorrenze_decrypt
 
 fine_occorrenze_decrypt:
-add t0, a6, t6
+add t0, a4, t4
 sb zero, 0(t0) # inserisco 0 in fondo alla stringa_in_chiaro
 
 # copio il vettore temporaneo che ho usato durante l'algoritmo nella stringa di destinazione (a0)
-addi a1, a6, 0
+addi a1, a4, 0
 jal str_copy 
 lw ra, 0(sp)
 addi sp, sp, 4
@@ -753,11 +708,21 @@ sw ra, 0(sp)
 
 # a0 stringa, a1 appoggio -> (in place)
 
+# per prima cosa controllo se la stringa ha un solo carattere e gestisco quel caso a parte altrimenti
 # scorro la stringa a0 e per ogni carattere controllo che non sia in a1 altrimenti ce lo inserisco
 # i primi due caratteri della stringa li inserisco a mano all'interno di a1 nell'ordine specificato dalla specifica
 # ovvero il primo carattere di a1 deve essere il secondo della stringa da cifrare
-# NB: questa procedura funziona sotto l'ipotesi iniziale che la variabile myplaintext contenga almeno due caratteri
 
+lb t2, 1(a0)
+bne t2, zero, check_trova_occorrenze_caratteri 
+# se arrivo qui è perchè il secondo carattere della stringa è '0' ciò significa che la stringa ha un solo carattere 
+# perciò devo inserirlo in posizione zero e terminare la procedura
+lb t2, 0(a0)
+sb t2, 0(a1)
+li t1, 1
+j end_loop_occorrenze_crypt
+
+check_trova_occorrenze_caratteri:
 li t0, 2 # indice for stringa
 li t1, 0 # indice array di appoggio (numero di caratteri univoci presenti nella stringa)
 

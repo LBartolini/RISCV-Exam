@@ -1,6 +1,6 @@
 .data
-myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
-mycypher: .string "ABCDE"
+myplaintext: .string "Test_0123_Dizionario"
+mycypher: .string "D"
 working_place: .word 800000
 _originale: .string "Originale: "
 _decifrato: .string "Decifrato: "
@@ -880,8 +880,7 @@ sb a2, 0(t1)
 j incr_dizionario
 
 dizionario_maiusc:
-addi a1, a1, 32 # trasformo in minusc
-li t2, 97
+li t2, 65
 # ottengo in a1 la 'posizione' (cominciando a contare da 0) nell'alfabeto
 # es: lettera b -> 1
 sub a1, a1, t2 
@@ -891,10 +890,8 @@ sb a1, 0(t1)
 j incr_dizionario
 
 dizionario_minusc:
-addi a1, a1, -32 # trasformo in maiusc
-li t2, 65
+li t2, 97
 # ottengo in a1 la 'posizione' (cominciando a contare da 0) nell'alfabeto
-# es: lettera b -> 1
 sub a1, a1, t2
 li a2, 90
 sub a1, a2, a1 # trovo il carattere corrispondente dell'alfabeto maiuscolo

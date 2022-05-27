@@ -22,18 +22,18 @@ end_modulo:
 #! end
 
 str_len:
-#! a0 t0 t1 t2
+#! a0 t0 t1
 #! manage_ra
 # a0 stringa (ptr) -> a0 len
 
 # scorro la stringa finchè non trovo il terminatore (0)
 # e conto i singoli caratteri (tramite l'indice)
 
-li t1, 0 # indice (e contatore)
+li t1, 0 # indice
 
 loop_str_len:
-add t2, a0, t1
-lb t0, 0(t2)
+add t0, a0, t1
+lb t0, 0(t0)
 beq t0, zero, end_str_len
 addi t1, t1, 1
 j loop_str_len
@@ -70,22 +70,21 @@ addi a0, t2, 0
 #! end
 
 conta_cifre: 
-#! a0 a1 t0 t1 t2
+#! a0 a1 t0 t1
 #! manage_ra
 
 # a0 numero -> a0 k cifre
 # controllo se il numero in input sia più piccolo della base, in tal caso restituisco il contatore
-# altrimenti moltiplico per 10 (utilizzando degli shift al posto dell'istruzione mul) e incremento il contatore
+# altrimenti moltiplico per 10 e incremento il contatore
 
-li t0, 1 # contatore
+li t0, 1 # contatore delle cifre
+li t1, 10 # valore costante dieci
 li a1, 10 # base
 
 loop_conta_cifre:
 blt a0, a1, end_loop_conta_cifre
 
-slli t1, a1, 3
-slli t2, a1, 1
-add a1, t1, t2 # a1*10
+mul a1, a1, t1 # a1 *= 10
 
 addi t0, t0, 1
 j loop_conta_cifre
@@ -122,22 +121,15 @@ sb t1, 0(t2) # inserisco lo 0 in fondo alla stringa dest a0
 #! end
 
 stampa_new_line:
-#! 
+#! a0 a7
 #! manage_ra
 
 # procedura che stampa semplicemente un carattere new_line
 
-addi sp, sp, -8
-sw a0, 4(sp)
-sw a7, 0(sp)
-
-la a0, new_line
+add a0, s5, zero
 li a7, 4
 ecall
 
-lw a7, 0(sp)
-lw a0, 4(sp)
-addi sp, sp, 8
 #! end
 
 delete_string:

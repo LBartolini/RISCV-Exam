@@ -47,11 +47,11 @@ sw ra, 0(sp)
 # scorro la stringa finchè non trovo il terminatore (0)
 # e conto i singoli caratteri (tramite l'indice)
 
-li t1, 0 # indice (e contatore)
+li t1, 0 # indice
 
 loop_str_len:
-add t2, a0, t1
-lb t0, 0(t2)
+add t0, a0, t1
+lb t0, 0(t0)
 beq t0, zero, end_str_len
 addi t1, t1, 1
 j loop_str_len
@@ -97,17 +97,16 @@ sw ra, 0(sp)
 
 # a0 numero -> a0 k cifre
 # controllo se il numero in input sia più piccolo della base, in tal caso restituisco il contatore
-# altrimenti moltiplico per 10 (utilizzando degli shift al posto dell'istruzione mul) e incremento il contatore
+# altrimenti moltiplico per 10 e incremento il contatore
 
-li t0, 1 # contatore
+li t0, 1 # contatore delle cifre
+li t1, 10 # valore costante dieci
 li a1, 10 # base
 
 loop_conta_cifre:
 blt a0, a1, end_loop_conta_cifre
 
-slli t1, a1, 3
-slli t2, a1, 1
-add a1, t1, t2 # a1*10
+mul a1, a1, t1 # a1 *= 10
 
 addi t0, t0, 1
 j loop_conta_cifre
@@ -153,17 +152,10 @@ sw ra, 0(sp)
 
 # procedura che stampa semplicemente un carattere new_line
 
-addi sp, sp, -8
-sw a0, 4(sp)
-sw a7, 0(sp)
-
-la a0, new_line
+add a0, s5, zero
 li a7, 4
 ecall
 
-lw a7, 0(sp)
-lw a0, 4(sp)
-addi sp, sp, 8
 lw ra, 0(sp)
 addi sp, sp, 4
 jr ra
@@ -323,19 +315,17 @@ sw ra, 0(sp)
 li a2, 0 # indice for stringa
 
 # calcolo la lunghezza del blocco e la salvo in t3(a1)
-addi sp, sp, -16
-sw a0, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
+addi sp, sp, -12
+sw a0, 8(sp)
+sw t0, 4(sp)
+sw t1, 0(sp)
 addi a0, a1, 0
 jal str_len
 addi t3, a0, 0 # len key
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a0, 8(sp)
+addi sp, sp, 12
 
 # ciclo che scorre la stringa a0
 loop_blocchi_crypt:
@@ -388,19 +378,17 @@ sw ra, 0(sp)
 li a2, 0 # indice for stringa
 
 # lunghezza del blocco
-addi sp, sp, -16
-sw a0, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
+addi sp, sp, -12
+sw a0, 8(sp)
+sw t0, 4(sp)
+sw t1, 0(sp)
 addi a0, a1, 0
 jal str_len
 addi t3, a0, 0 # len key
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a0, 8(sp)
+addi sp, sp, 12
 
 # ciclo che scorre la stringa
 loop_blocchi_decrypt:
@@ -460,7 +448,8 @@ sw ra, 0(sp)
 # e ogni volta che trovo il carattere attuale vado a scomporre il numero che identifica
 # la posizione in cifre e le salvo nella stringa di return come caratteri ascii
 
-lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+# ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+lw a2, app_occorrenze 
 # secondo array di appoggio in cui lavoro per non corrompere la stringa in chiaro
 # alla fine dell'algoritmo copierò tutti gli elementi da questo vettore (a5) in quello di destinazione (a1)
 # NB: nei commenti all'interno dei due cicli for, il vettore cypher_text è in realtà il vettore di appoggio
@@ -518,21 +507,19 @@ sb t0, 0(t2) # inserisco -
 # una volta finito il ciclo, l'indice del cypher_text viene posizionato al byte 
 # successivo alla cifra delle unità nel cypher_text
 
-addi sp, sp, -20
-sw a0, 16(sp)
-sw a1, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
+addi sp, sp, -16
+sw a0, 12(sp)
+sw a1, 8(sp)
+sw t0, 4(sp)
+sw t1, 0(sp)
 addi a0, t3, 0
 jal conta_cifre
 addi t6, a0, 0 # numero di cifre di t3 (pos del carattere)
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a1, 12(sp)
-lw a0, 16(sp)
-addi sp, sp, 20
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a1, 8(sp)
+lw a0, 12(sp)
+addi sp, sp, 16
 
 # inserisco nella stack per preservarne il valore perchè questi registri verranno modificati sotto
 addi sp, sp, -8
@@ -556,7 +543,7 @@ lw a0, 4(sp)
 addi sp, sp, 8
 
 li t4, 10
-divu t3, t3, t4 # divido per 10
+div t3, t3, t4 # divido per 10
 
 add t4, a5, t5
 add t4, t4, t6 # calcolo la posizione corretta in cui effettuare la store
@@ -592,10 +579,9 @@ addi t1, t1, 1
 j for_esterno
 end_for_esterno:
 
-li t0, 0
 addi t5, t5, -1
 add t4, a5, t5
-sb t0, 0(t4) # salvo il terminatore di stringa nel vettore di appoggio a5
+sb zero, 0(t4) # salvo il terminatore di stringa nel vettore di appoggio a5
 
 # copio l'intero vettore in a1 (cypher_text)
 addi sp, sp, -20
@@ -788,18 +774,16 @@ sw ra, 0(sp)
 # ovvero riapplicando la stessa procedura si riottiene la stringa di partenza
 
 # calcolo la lunghezza della stringa in a1
-addi sp, sp, -16
-sw a0, 12(sp)
-sw t0, 8(sp)
-sw t1, 4(sp)
-sw t2, 0(sp)
+addi sp, sp, -12
+sw a0, 8(sp)
+sw t0, 4(sp)
+sw t1, 0(sp)
 jal str_len
 addi a1, a0, 0
-lw t2, 0(sp)
-lw t1, 4(sp)
-lw t0, 8(sp)
-lw a0, 12(sp)
-addi sp, sp, 16
+lw t1, 0(sp)
+lw t0, 4(sp)
+lw a0, 8(sp)
+addi sp, sp, 12
 
 srli a2, a1, 1 # divido per due per sapere quando fermarmi
 li t0, 0 # indice per scorrere la stringa
@@ -907,23 +891,27 @@ addi sp, sp, 4
 jr ra
 
 main:
+# inizializzo tutti i registri del main
+li s0, 0 # indice per scorrere mycypher
+la s1, mycypher
+lw s2, working_place
+lw s3, sostK # chiave per cifrario a sostituzione
+lw s4, blocKey # chiave per cifrario a blocchi
+la s5, new_line
+
 # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro 
 # per gli algoritmi senza influenzare la memoria circostante 
 # (specialmente durante l'algoritmo occorrenze)
-lw a0, working_place
+add a0, s2, zero
 la a1, myplaintext
 jal str_copy 
-
-li s0, 0 # contatore degli algoritmi di cifratura applicati
-li s1, 0 # indice per scorrere mycypher
-la s2, mycypher
 
 # Fase di cifratura:
 # scorro la stringa mycypher e per ogni carattere decido quale algoritmo applicare
 # ogni volta carico nei registri di input (a0-a1-...) i dati necessari
 # tra un'esecuzione e l'altra stampo i risultati parziali
 loop_crypt_main:
-add t0, s2, s1
+add t0, s1, s0
 lb t1, 0(t0) # algoritmo di cifratura attuale
 beq t1, zero, loop_decrypt_main 
 
@@ -949,8 +937,8 @@ la a0, _alg_a_cesare
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-lw a1, sostK
+add a0, s2, zero
+add a1, s3, zero
 jal cesare_crypt
 
 j incr_crypt_main
@@ -960,8 +948,8 @@ la a0, _alg_b_blocchi
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-la a1, blocKey
+add a0, s2, zero
+add a1, s4, zero
 jal blocchi_crypt
 
 j incr_crypt_main
@@ -971,8 +959,8 @@ la a0, _alg_c_occorrenze
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-addi a1, a0, 0
+add a0, s2, zero
+add a1, a0, zero
 jal occorrenze_crypt
 
 j incr_crypt_main
@@ -982,7 +970,7 @@ la a0, _alg_d_dizionario
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal dizionario
 
 j incr_crypt_main
@@ -992,7 +980,7 @@ la a0, _alg_e_inversione
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal inversione_stringa
 
 incr_crypt_main:
@@ -1002,7 +990,7 @@ ecall
 jal stampa_new_line
 jal stampa_new_line
 
-addi s1, s1, 1
+addi s0, s0, 1
 j loop_crypt_main
 
 # Fase di decifratura:
@@ -1010,9 +998,9 @@ j loop_crypt_main
 # scelgo per ogni carattere il giusto algoritmo di decifratura
 # stampo ogni volta il risultato parziale
 loop_decrypt_main:
-addi s1, s1, -1
-blt s1, zero, end_decrypt_main 
-add t0, s2, s1
+addi s0, s0, -1
+blt s0, zero, end_decrypt_main 
+add t0, s1, s0
 lb t1, 0(t0) # algoritmo di decifratura attuale
 
 la a0, _decifrato_usando
@@ -1036,8 +1024,8 @@ la a0, _alg_a_cesare
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-lw a1, sostK
+add a0, s2, zero
+add a1, s3, zero
 jal cesare_decrypt
 
 j incr_decrypt_main
@@ -1047,8 +1035,8 @@ la a0, _alg_b_blocchi
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-la a1, blocKey
+add a0, s2, zero
+add a1, s4, zero
 jal blocchi_decrypt
 
 j incr_decrypt_main
@@ -1058,8 +1046,8 @@ la a0, _alg_c_occorrenze
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-addi a1, a0, 0
+add a0, s2, zero
+add a1, a0, zero
 jal occorrenze_decrypt
 
 j incr_decrypt_main
@@ -1069,7 +1057,7 @@ la a0, _alg_d_dizionario
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal dizionario
 
 j incr_decrypt_main
@@ -1079,7 +1067,7 @@ la a0, _alg_e_inversione
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal inversione_stringa
 
 incr_decrypt_main:
@@ -1093,16 +1081,12 @@ j loop_decrypt_main
 
 end_decrypt_main:
 
-jal stampa_new_line
-jal stampa_new_line
-
 # infine stampo la stringa che ha subito il processo di cifratura-decifratura
 # insieme alla stringa originale per confrontare il risultato
 li a7, 4
-addi t0, a0, 0
 la a0, _decifrato
 ecall
-addi a0, t0, 0
+addi a0, s2, 0
 ecall
 
 jal stampa_new_line

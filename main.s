@@ -21,23 +21,27 @@ _alg_d_dizionario: .string "Algoritmo a Dizionario (D)"
 _alg_e_inversione: .string "Algoritmo a Inversione (E)"
 .text
 main:
+# inizializzo tutti i registri del main
+li s0, 0 # indice per scorrere mycypher
+la s1, mycypher
+lw s2, working_place
+lw s3, sostK # chiave per cifrario a sostituzione
+lw s4, blocKey # chiave per cifrario a blocchi
+la s5, new_line
+
 # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro 
 # per gli algoritmi senza influenzare la memoria circostante 
 # (specialmente durante l'algoritmo occorrenze)
-lw a0, working_place
+add a0, s2, zero
 la a1, myplaintext
 jal str_copy 
-
-li s0, 0 # contatore degli algoritmi di cifratura applicati
-li s1, 0 # indice per scorrere mycypher
-la s2, mycypher
 
 # Fase di cifratura:
 # scorro la stringa mycypher e per ogni carattere decido quale algoritmo applicare
 # ogni volta carico nei registri di input (a0-a1-...) i dati necessari
 # tra un'esecuzione e l'altra stampo i risultati parziali
 loop_crypt_main:
-add t0, s2, s1
+add t0, s1, s0
 lb t1, 0(t0) # algoritmo di cifratura attuale
 beq t1, zero, loop_decrypt_main 
 
@@ -63,8 +67,8 @@ la a0, _alg_a_cesare
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-lw a1, sostK
+add a0, s2, zero
+add a1, s3, zero
 jal cesare_crypt
 
 j incr_crypt_main
@@ -74,8 +78,8 @@ la a0, _alg_b_blocchi
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-la a1, blocKey
+add a0, s2, zero
+add a1, s4, zero
 jal blocchi_crypt
 
 j incr_crypt_main
@@ -85,8 +89,8 @@ la a0, _alg_c_occorrenze
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-addi a1, a0, 0
+add a0, s2, zero
+add a1, a0, zero
 jal occorrenze_crypt
 
 j incr_crypt_main
@@ -96,7 +100,7 @@ la a0, _alg_d_dizionario
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal dizionario
 
 j incr_crypt_main
@@ -106,7 +110,7 @@ la a0, _alg_e_inversione
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal inversione_stringa
 
 incr_crypt_main:
@@ -116,7 +120,7 @@ ecall
 jal stampa_new_line
 jal stampa_new_line
 
-addi s1, s1, 1
+addi s0, s0, 1
 j loop_crypt_main
 
 # Fase di decifratura:
@@ -124,9 +128,9 @@ j loop_crypt_main
 # scelgo per ogni carattere il giusto algoritmo di decifratura
 # stampo ogni volta il risultato parziale
 loop_decrypt_main:
-addi s1, s1, -1
-blt s1, zero, end_decrypt_main 
-add t0, s2, s1
+addi s0, s0, -1
+blt s0, zero, end_decrypt_main 
+add t0, s1, s0
 lb t1, 0(t0) # algoritmo di decifratura attuale
 
 la a0, _decifrato_usando
@@ -150,8 +154,8 @@ la a0, _alg_a_cesare
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-lw a1, sostK
+add a0, s2, zero
+add a1, s3, zero
 jal cesare_decrypt
 
 j incr_decrypt_main
@@ -161,8 +165,8 @@ la a0, _alg_b_blocchi
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-la a1, blocKey
+add a0, s2, zero
+add a1, s4, zero
 jal blocchi_decrypt
 
 j incr_decrypt_main
@@ -172,8 +176,8 @@ la a0, _alg_c_occorrenze
 ecall
 jal stampa_new_line
 
-lw a0, working_place
-addi a1, a0, 0
+add a0, s2, zero
+add a1, a0, zero
 jal occorrenze_decrypt
 
 j incr_decrypt_main
@@ -183,7 +187,7 @@ la a0, _alg_d_dizionario
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal dizionario
 
 j incr_decrypt_main
@@ -193,7 +197,7 @@ la a0, _alg_e_inversione
 ecall
 jal stampa_new_line
 
-lw a0, working_place
+add a0, s2, zero
 jal inversione_stringa
 
 incr_decrypt_main:
@@ -207,17 +211,12 @@ j loop_decrypt_main
 
 end_decrypt_main:
 
-jal stampa_new_line
-jal stampa_new_line
-
-
 # infine stampo la stringa che ha subito il processo di cifratura-decifratura
 # insieme alla stringa originale per confrontare il risultato
 li a7, 4
-addi t0, a0, 0
 la a0, _decifrato
 ecall
-addi a0, t0, 0
+addi a0, s2, 0
 ecall
 
 jal stampa_new_line

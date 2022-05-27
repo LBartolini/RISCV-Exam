@@ -14,7 +14,8 @@ occorrenze_crypt:
 # e ogni volta che trovo il carattere attuale vado a scomporre il numero che identifica
 # la posizione in cifre e le salvo nella stringa di return come caratteri ascii
 
-lw a2, app_occorrenze # ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+# ptr array di appoggio in cui salvo tutti i caratteri presenti nella stringa di partenza
+lw a2, app_occorrenze 
 # secondo array di appoggio in cui lavoro per non corrompere la stringa in chiaro
 # alla fine dell'algoritmo copierò tutti gli elementi da questo vettore (a5) in quello di destinazione (a1)
 # NB: nei commenti all'interno dei due cicli for, il vettore cypher_text è in realtà il vettore di appoggio
@@ -82,7 +83,7 @@ addi t0, a0, 0 # t0 = ultima cifra
 #! postcall(modulo)
 
 li t4, 10
-divu t3, t3, t4 # divido per 10
+div t3, t3, t4 # divido per 10
 
 add t4, a5, t5
 add t4, t4, t6 # calcolo la posizione corretta in cui effettuare la store
@@ -118,10 +119,9 @@ addi t1, t1, 1
 j for_esterno
 end_for_esterno:
 
-li t0, 0
 addi t5, t5, -1
 add t4, a5, t5
-sb t0, 0(t4) # salvo il terminatore di stringa nel vettore di appoggio a5
+sb zero, 0(t4) # salvo il terminatore di stringa nel vettore di appoggio a5
 
 # copio l'intero vettore in a1 (cypher_text)
 #! precall(str_copy)

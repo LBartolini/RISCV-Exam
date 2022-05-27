@@ -8,7 +8,7 @@ modulo:
 # a0 x, a1 n -> a0 (x%n)
 
 # sommo n ad x finchè x non è maggiore di zero
-# e poi restituisco il risultato del resto della divisione
+# e poi restituisco come risultato il resto della divisione x/n, ovvero x%n
 
 loop_modulo_1:
 bge a0, zero, continue_modulo

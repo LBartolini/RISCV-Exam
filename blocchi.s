@@ -1,5 +1,5 @@
 .data
-blocKey: .string "OLE"
+blocKey: .string "abc"
 .text
 
 blocchi_crypt: 

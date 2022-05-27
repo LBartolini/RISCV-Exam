@@ -1,6 +1,6 @@
 .data
-myplaintext: .string "Test_0123_Dizionario"
-mycypher: .string "D"
+myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
+mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "
 _decifrato: .string "Decifrato: "
@@ -13,7 +13,7 @@ _alg_d_dizionario: .string "Algoritmo a Dizionario (D)"
 _alg_e_inversione: .string "Algoritmo a Inversione (E)"
 new_line: .string "\n"
 sostK: .word 1
-blocKey: .string "OLE"
+blocKey: .string "abc"
 app_occorrenze: .word 200000
 app_2_occorrenze: .word 500000
 .text
@@ -24,7 +24,7 @@ sw ra, 0(sp)
 # a0 x, a1 n -> a0 (x%n)
 
 # sommo n ad x finchè x non è maggiore di zero
-# e poi restituisco il risultato del resto della divisione
+# e poi restituisco come risultato il resto della divisione x/n, ovvero x%n
 
 loop_modulo_1:
 bge a0, zero, continue_modulo

@@ -7,7 +7,7 @@
 #!include dizionario.s
 
 .data
-myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
+myplaintext: .string "Test Completo"
 mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "
@@ -27,7 +27,7 @@ la s1, mycypher
 lw s2, working_place
 lw s3, sostK # chiave per cifrario a sostituzione
 lw s4, blocKey # chiave per cifrario a blocchi
-la s5, new_line
+lw s5, new_line
 
 # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro 
 # per gli algoritmi senza influenzare la memoria circostante 

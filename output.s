@@ -1,5 +1,5 @@
 .data
-myplaintext: .string "a$%--..dsfsksD!SFSDFsdsf"
+myplaintext: .string "Test Completo"
 mycypher: .string "ABCDE"
 working_place: .word 800000
 _originale: .string "Originale: "
@@ -11,7 +11,7 @@ _alg_b_blocchi: .string "Algoritmo a Blocchi (B)"
 _alg_c_occorrenze: .string "Algoritmo a Occorrenze (C)"
 _alg_d_dizionario: .string "Algoritmo a Dizionario (D)"
 _alg_e_inversione: .string "Algoritmo a Inversione (E)"
-new_line: .string "\n"
+new_line: .word 10
 sostK: .word 1
 blocKey: .string "abc"
 app_occorrenze: .word 200000
@@ -153,7 +153,7 @@ sw ra, 0(sp)
 # procedura che stampa semplicemente un carattere new_line
 
 add a0, s5, zero
-li a7, 4
+li a7, 11
 ecall
 
 lw ra, 0(sp)
@@ -653,7 +653,7 @@ li t2, 10
 mul a3, a3, t2 # moltiplico per 10 la somma parziale e successivamente sommo il numero appena trovato
 
 addi t1, t1, -48 # normalizzazione ascii
-add a3, a3, t1
+add a3, a3, t1 
 
 j incr_loop_occorrenze_decrypt
 
@@ -897,7 +897,7 @@ la s1, mycypher
 lw s2, working_place
 lw s3, sostK # chiave per cifrario a sostituzione
 lw s4, blocKey # chiave per cifrario a blocchi
-la s5, new_line
+lw s5, new_line
 
 # copio in working_place il myplaintext per utilizzarlo come luogo di lavoro 
 # per gli algoritmi senza influenzare la memoria circostante 

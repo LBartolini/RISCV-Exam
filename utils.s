@@ -1,5 +1,5 @@
 .data
-new_line: .string "\n"
+new_line: .word 10
 .text
 
 modulo:
@@ -127,7 +127,7 @@ stampa_new_line:
 # procedura che stampa semplicemente un carattere new_line
 
 add a0, s5, zero
-li a7, 4
+li a7, 11
 ecall
 
 #! end
